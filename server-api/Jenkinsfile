@@ -14,7 +14,7 @@ pipeline {
     stages {
         stage('Pull code') {
             steps {
-                git branch: 'master', credentialsId: '09267d83-3027-4ac5-a940-e0e61757e48a', url: ${git_url}
+                git branch: 'master', credentialsId: '09267d83-3027-4ac5-a940-e0e61757e48a', url: "${git_url}"
             }
         }
 		
