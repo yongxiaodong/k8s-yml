@@ -53,6 +53,8 @@ pipeline {
         }
         stage('deploy') {
             steps {
+                sh 'mkdir k8s-yml && cd k8s-yml'
+                git branch: 'master', credentialsId: '09267d83-3027-4ac5-a940-e0e61757e48a', url: 'http://47.101.131.117:3000/super_user/k8s-yml.git'
                 sh 'sed -i "s/\\(^.*image: \\)\\(.*$\\)/\\1${docker_registry}\\/${docker_registry_item}\\/${image_name}:${BUILD_ID}/g" prd_deploy.yml'
                 kubernetesDeploy configs: 'prd_deploy.yml', kubeConfig: [path: ''], kubeconfigId: 'e94c584f-510a-4b20-be41-eda4a9b35770', secretName: '', ssh: [sshCredentialsId: '*', sshServer: ''], textCredentials: [certificateAuthorityData: '', clientCertificateData: '', clientKeyData: '', serverUrl: 'https://']
             }
