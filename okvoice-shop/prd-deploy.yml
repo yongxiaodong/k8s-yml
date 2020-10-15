@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: okvoice-shop
-        image: 172.26.112.47/test/okvoice_biz:58
+        image: 172.26.112.47/okvoice-shop/okvoice-shop:4
         ports:
         - containerPort: 9000
         resources:

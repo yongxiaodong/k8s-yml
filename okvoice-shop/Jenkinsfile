@@ -5,10 +5,10 @@ pipeline {
         }
     }
    environment {
-       git_url = 'http://47.101.131.117:3000/okyunyin/server.git'
+	   git_url = 'http://47.101.131.117:3000/okvoice/okvoice-shop.git'
        docker_registry = '172.26.112.47'
-       docker_registry_item = 'server-api'
-       image_name = 'server-api'
+       docker_registry_item = 'okvoice-shop'
+	   image_name = 'okvoice-shop'
        docker_image_fqdn = '${docker_registry}/${docker_registry_item}/${image_name}:${BUILD_ID}'
    }
     stages {
