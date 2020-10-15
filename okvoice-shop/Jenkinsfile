@@ -1,0 +1,64 @@
+pipeline {
+    agent {
+    node {
+        label 'jenkinsbuildnode'
+        }
+    }
+   environment {
+       git_url = 'http://47.101.131.117:3000/okyunyin/server.git'
+       docker_registry = '172.26.112.47'
+       docker_registry_item = 'server-api'
+       image_name = 'server-api'
+       docker_image_fqdn = '${docker_registry}/${docker_registry_item}/${image_name}:${BUILD_ID}'
+   }
+    stages {
+        stage('Pull code') {
+            steps {
+                git branch: 'master', credentialsId: '09267d83-3027-4ac5-a940-e0e61757e48a', url: ${git_url}
+            }
+        }
+		
+      stage('get_commit_msg') {
+         steps {
+            script {
+               env.GIT_COMMIT_MSG = sh (script: 'git log -1 --pretty=%B ${GIT_COMMIT}', returnStdout: true).trim()
+            }
+        }
+      }
+	  stage('mvn') {                      
+         when {
+            changelog '.*$'
+            }
+            steps {
+                sh '''
+                mvn -B -DskipTests clean package
+                '''
+            }
+		}
+        stage('modify Dockerfile') {
+            steps {
+                sh 'sed -i \'s/^.*ENV PROFILES_ACTIVE biz-dev.*$/ENV PROFILES_ACTIVE biz/g\' Dockerfile'
+            }
+        }
+        
+        stage('build docker image') {
+            steps {
+                sh """
+                docker build -t  ${docker_image_fqdn} .
+                docker login -u admin -p okvoice ${docker_registry}
+                docker push ${docker_image_fqdn}
+                docker rmi ${docker_image_fqdn}
+                """
+            }
+        }
+        stage('deploy') {
+            steps {
+                sh 'sed -i "s/\\(^.*image: \\)\\(.*$\\)/\\1${docker_registry}\\/${docker_registry_item}\\/${image_name}:${BUILD_ID}/g" prd_deploy.yml'
+                kubernetesDeploy configs: 'prd_deploy.yml', kubeConfig: [path: ''], kubeconfigId: 'e94c584f-510a-4b20-be41-eda4a9b35770', secretName: '', ssh: [sshCredentialsId: '*', sshServer: ''], textCredentials: [certificateAuthorityData: '', clientCertificateData: '', clientKeyData: '', serverUrl: 'https://']
+            }
+        }
+
+
+    }
+}
+
