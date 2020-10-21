@@ -10,7 +10,6 @@ pipeline {
        docker_registry_item = 'server-api'
        image_name = 'server-api'
        docker_image_fqdn = '${docker_registry}/${docker_registry_item}/${image_name}:${BUILD_ID}'
-	   git_dir = './project'
    }
     stages {
 
@@ -45,7 +44,7 @@ pipeline {
 		stage('build docker image') {
 			steps {
 				dir('./project') {
-				sh 'sed -i \'s/^.*ENV PROFILES_ACTIVE.*$/ENV PROFILES_ACTIVE ${PROFILES_ACTIVE_VALUE}/g\' prd_Dockerfile'
+				sh 'sed -i "s/^.*ENV PROFILES_ACTIVE.*$/ENV PROFILES_ACTIVE ${PROFILES_ACTIVE_VALUE}/g" prd_Dockerfile'
 				sh """
 				docker build -t  ${docker_image_fqdn} -f prd_Dockerfile  .
 				docker login -u admin -p okvoice ${docker_registry}
