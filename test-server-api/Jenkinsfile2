@@ -14,7 +14,10 @@ pipeline {
     stages {
         stage('init') {
             steps {
-                sh 'mkdir k8s-yml && ls | grep -v k8s-yml | grep -v project | xargs -i mv {} k8s-yml/'
+                sh '''
+				mkdir k8s-yml | exit 0
+				ls | grep -v k8s-yml | grep -v project | xargs -i mv {} k8s-yml/
+				'''
             }
         }
 		dir('./project/') {
