@@ -30,11 +30,11 @@ pipeline {
 		}
 	  }
 	  stage('mvn') {
-			if ( skip == 'no' ) {
 					//  when {
 			//     changelog '.*$'
 			//     }
 				steps {
+					if ( skip == 'no' ) {
 					dir('./project') {
 					sh '''
 					mvn -B -DskipTests clean package
