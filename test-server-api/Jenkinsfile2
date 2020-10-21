@@ -25,7 +25,7 @@ pipeline {
 
 		stage('Pull code') {
 			steps {
-			dir('${git_dir}') {
+			dir('./project') {
 				git branch: '${branch_name}', credentialsId: '09267d83-3027-4ac5-a940-e0e61757e48a', url: "${git_url}"
 				sh "/bin/cp -fR ../k8s-yml/${JOB_NAME}/* ./"
 			}
@@ -44,7 +44,7 @@ pipeline {
 		//     changelog '.*$'
 		//     }
 			steps {
-				dir('${git_dir}') {
+				dir('./project') {
 				sh '''
 				mvn -B -DskipTests clean package
 				'''
@@ -53,7 +53,7 @@ pipeline {
 		}
 		stage('build docker image') {
 			steps {
-				dir('${git_dir}') {
+				dir('./project') {
 				sh 'sed -i \'s/^.*ENV PROFILES_ACTIVE.*$/ENV PROFILES_ACTIVE ${PROFILES_ACTIVE_VALUE}/g\' prd_Dockerfile'
 				sh """
 				docker build -t  ${docker_image_fqdn} -f prd_Dockerfile  .
@@ -66,7 +66,7 @@ pipeline {
 		}
 		stage('deploy') {
 			steps {
-				dir('${git_dir}') {
+				dir('./project') {
 				sh 'sed -i "s/\\(^.*image: \\)\\(.*$\\)/\\1${docker_registry}\\/${docker_registry_item}\\/${image_name}:${BUILD_ID}/g" ${deploy_file}'
 				kubernetesDeploy configs: '${deploy_file}', kubeConfig: [path: ''], kubeconfigId: 'e94c584f-510a-4b20-be41-eda4a9b35770', secretName: '', ssh: [sshCredentialsId: '*', sshServer: ''], textCredentials: [certificateAuthorityData: '', clientCertificateData: '', clientKeyData: '', serverUrl: 'https://']
 			}
