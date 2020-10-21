@@ -17,7 +17,7 @@ pipeline {
             steps {
                 sh '''
 				mkdir k8s-yml | exit 0
-				ls | grep -v k8s-yml | grep -v project | grep project@tmp | xargs -i mv {} k8s-yml/
+				ls | grep -v k8s-yml | grep -v project | grep project@tmp | xargs -i /bin/mv -f {} k8s-yml/
 				mkdir project | exit 0
 				'''
             }
@@ -40,11 +40,11 @@ pipeline {
 		}
 	  }
 	  stage('mvn') {
-			dir('${git_dir}') {
 		//  when {
 		//     changelog '.*$'
 		//     }
 			steps {
+				dir('${git_dir}') {
 				sh '''
 				mvn -B -DskipTests clean package
 				'''
@@ -52,8 +52,8 @@ pipeline {
 			}
 		}
 		stage('build docker image') {
-			dir('${git_dir}') {
 			steps {
+				dir('${git_dir}') {
 				sh 'sed -i \'s/^.*ENV PROFILES_ACTIVE.*$/ENV PROFILES_ACTIVE ${PROFILES_ACTIVE_VALUE}/g\' prd_Dockerfile'
 				sh """
 				docker build -t  ${docker_image_fqdn} -f prd_Dockerfile  .
@@ -65,8 +65,8 @@ pipeline {
 			}
 		}
 		stage('deploy') {
-			dir('${git_dir}') {
 			steps {
+				dir('${git_dir}') {
 				sh 'sed -i "s/\\(^.*image: \\)\\(.*$\\)/\\1${docker_registry}\\/${docker_registry_item}\\/${image_name}:${BUILD_ID}/g" ${deploy_file}'
 				kubernetesDeploy configs: '${deploy_file}', kubeConfig: [path: ''], kubeconfigId: 'e94c584f-510a-4b20-be41-eda4a9b35770', secretName: '', ssh: [sshCredentialsId: '*', sshServer: ''], textCredentials: [certificateAuthorityData: '', clientCertificateData: '', clientKeyData: '', serverUrl: 'https://']
 			}
