@@ -30,16 +30,19 @@ pipeline {
 		}
 	  }
 	  stage('mvn') {
-		//  when {
-		//     changelog '.*$'
-		//     }
-			steps {
-				dir('./project') {
-				sh '''
-				mvn -B -DskipTests clean package
-				'''
+			if ( skip == 'no' ) {
+					//  when {
+			//     changelog '.*$'
+			//     }
+				steps {
+					dir('./project') {
+					sh '''
+					mvn -B -DskipTests clean package
+					'''
+				}
+				}
 			}
-			}
+
 		}
 		stage('build docker image') {
 			steps {
@@ -58,7 +61,7 @@ pipeline {
 			steps {
 				dir('./project') {
 				sh 'sed -i "s/\\(^.*image: \\)\\(.*$\\)/\\1${docker_registry}\\/${docker_registry_item}\\/${image_name}:${BUILD_ID}/g" test_deploy.yml'
-				kubernetesDeploy configs: 'test_deploy.yml', kubeConfig: [path: ''], kubeconfigId: 'e94c584f-510a-4b20-be41-eda4a9b35770', secretName: '', ssh: [sshCredentialsId: '*', sshServer: ''], textCredentials: [certificateAuthorityData: '', clientCertificateData: '', clientKeyData: '', serverUrl: 'https://']
+				kubernetesDeploy configs: 'test_deploy.yml', kubeConfig: [path: ''], kubeconfigId: '1e486a1c-7a15-425e-adf2-e114d233ded5', secretName: '', ssh: [sshCredentialsId: '*', sshServer: ''], textCredentials: [certificateAuthorityData: '', clientCertificateData: '', clientKeyData: '', serverUrl: 'https://']
 			}
 			}
 		}
