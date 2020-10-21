@@ -10,13 +10,14 @@ pipeline {
        docker_registry_item = 'server-api'
        image_name = 'server-api'
        docker_image_fqdn = '${docker_registry}/${docker_registry_item}/${image_name}:${BUILD_ID}'
+	   git_dir = './project'
    }
     stages {
         stage('init') {
             steps {
                 sh '''
 				mkdir k8s-yml | exit 0
-				ls | grep -v k8s-yml | grep -v project | xargs -i mv {} k8s-yml/
+				ls | grep -v k8s-yml | grep -v project | grep project@tmp | xargs -i mv {} k8s-yml/
 				mkdir project | exit 0
 				'''
             }
@@ -24,14 +25,10 @@ pipeline {
 
 		stage('Pull code') {
 			steps {
-			dir('./project') {
+			dir('${git_dir}') {
 				git branch: '${branch_name}', credentialsId: '09267d83-3027-4ac5-a940-e0e61757e48a', url: "${git_url}"
-			}
-			}
-		}
-		stage('copy file to current project') {
-			steps {
 				sh "/bin/cp -fR ../k8s-yml/${JOB_NAME}/* ./"
+			}
 			}
 		}
 		
@@ -42,7 +39,8 @@ pipeline {
 			}
 		}
 	  }
-	  stage('mvn') {                      
+	  stage('mvn') {
+			dir('${git_dir}') {
 		//  when {
 		//     changelog '.*$'
 		//     }
@@ -51,15 +49,12 @@ pipeline {
 				mvn -B -DskipTests clean package
 				'''
 			}
-		}
-		stage('modify Dockerfile') {
-			steps {
-				sh 'sed -i \'s/^.*ENV PROFILES_ACTIVE.*$/ENV PROFILES_ACTIVE ${PROFILES_ACTIVE_VALUE}/g\' prd_Dockerfile'
 			}
 		}
-		
 		stage('build docker image') {
+			dir('${git_dir}') {
 			steps {
+				sh 'sed -i \'s/^.*ENV PROFILES_ACTIVE.*$/ENV PROFILES_ACTIVE ${PROFILES_ACTIVE_VALUE}/g\' prd_Dockerfile'
 				sh """
 				docker build -t  ${docker_image_fqdn} -f prd_Dockerfile  .
 				docker login -u admin -p okvoice ${docker_registry}
@@ -67,11 +62,14 @@ pipeline {
 				docker rmi ${docker_image_fqdn}
 				"""
 			}
+			}
 		}
 		stage('deploy') {
+			dir('${git_dir}') {
 			steps {
 				sh 'sed -i "s/\\(^.*image: \\)\\(.*$\\)/\\1${docker_registry}\\/${docker_registry_item}\\/${image_name}:${BUILD_ID}/g" ${deploy_file}'
 				kubernetesDeploy configs: '${deploy_file}', kubeConfig: [path: ''], kubeconfigId: 'e94c584f-510a-4b20-be41-eda4a9b35770', secretName: '', ssh: [sshCredentialsId: '*', sshServer: ''], textCredentials: [certificateAuthorityData: '', clientCertificateData: '', clientKeyData: '', serverUrl: 'https://']
+			}
 			}
 		}
 
