@@ -21,10 +21,12 @@ pipeline {
 				'''
             }
         }
-		dir('./project') {
+
 		stage('Pull code') {
 			steps {
+			dir('./project') {
 				git branch: '${branch_name}', credentialsId: '09267d83-3027-4ac5-a940-e0e61757e48a', url: "${git_url}"
+			}
 			}
 		}
 		stage('copy file to current project') {
@@ -74,7 +76,6 @@ pipeline {
 		}
 
 
-}
 	}
 }
 
