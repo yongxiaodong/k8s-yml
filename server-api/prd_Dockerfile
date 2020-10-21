@@ -1,5 +1,5 @@
 FROM 172.26.112.47/base_lib/okvoice_base:v1
-MAINTAINER  pascall zhangjie@pascall.xyz
+MAINTAINER  yunwei
 
 ENV PROFILES_ACTIVE biz-test
 ENV SNOW_FLAKE_WORK_ID 1
