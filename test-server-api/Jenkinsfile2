@@ -34,11 +34,13 @@ pipeline {
 			//     changelog '.*$'
 			//     }
 				steps {
+				script {
 					if ( skip == 'no' ) {
 					dir('./project') {
 					sh '''
 					mvn -B -DskipTests clean package
 					'''
+				}
 				}
 				}
 			}
