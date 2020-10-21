@@ -13,21 +13,12 @@ pipeline {
 	   git_dir = './project'
    }
     stages {
-        stage('init') {
-            steps {
-                sh '''
-				mkdir k8s-yml | exit 0
-				ls | grep -v k8s-yml | grep -v project | grep project@tmp | xargs -i /bin/mv -f {} k8s-yml/
-				mkdir project | exit 0
-				'''
-            }
-        }
 
 		stage('Pull code') {
 			steps {
 			dir('./project') {
 				git branch: '${branch_name}', credentialsId: '09267d83-3027-4ac5-a940-e0e61757e48a', url: "${git_url}"
-				sh "/bin/cp -fR ../k8s-yml/${JOB_NAME}/* ./"
+				sh "/bin/cp -fR ../${JOB_NAME}/* ./"
 			}
 			}
 		}
