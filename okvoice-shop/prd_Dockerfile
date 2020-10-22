@@ -1,0 +1,10 @@
+FROM 172.26.112.47/base_lib/openjdk:8u181-jre
+MAINTAINER  sre
+
+ENV PROFILES_ACTIVE pro
+COPY target/okvoice-shop-0.0.1.jar /app.jar
+RUN echo "Asia/Shanghai" > /etc/timezone
+VOLUME /logs
+EXPOSE 9000
+EXPOSE 5005
+CMD java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005 -XX:+UseG1GC -jar /app.jar --spring.profiles.active=$PROFILES_ACTIVE
