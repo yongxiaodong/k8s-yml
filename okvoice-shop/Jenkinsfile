@@ -8,7 +8,7 @@ pipeline {
 	   git_url = 'http://47.101.131.117:3000/okvoice/okvoice-shop.git'
        docker_registry = '172.26.112.47'
        docker_registry_item = 'okvoice-shop'
-	   image_name = ${docker_registry_item}
+	   image_name = "${docker_registry_item}"
        docker_image_fqdn = '${docker_registry}/${docker_registry_item}/${image_name}:${BUILD_ID}'
    }
     stages {
