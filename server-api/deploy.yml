@@ -21,8 +21,6 @@ spec:
       containers:
       - name: server-api
         image: 172.26.112.47/server-api/server-api:94
-        ports:
-        - containerPort: 9090
         resources:
           requests:
             cpu: "100m"

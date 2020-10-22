@@ -21,8 +21,6 @@ spec:
       containers:
       - name: okvoice-shop
         image: 172.26.112.47/okvoice-shop/okvoice-shop:4
-        ports:
-        - containerPort: 9000
         resources:
           requests:
             cpu: "100m"
@@ -69,7 +67,7 @@ metadata:
   namespace: okvoice-shop
 spec:
   rules:
-    - host: k8s-myshop.okyuyin.com
+    - host: prd-k8s-myshop.okyuyin.com
       http:
         paths:
         - path: /
