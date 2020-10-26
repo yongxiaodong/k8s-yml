@@ -5,7 +5,7 @@ pipeline {
         }
     }
    environment {
-       git_url = 'http://47.101.131.117:3000/renlin/task-publish.git'
+       git_url = 'http://47.101.131.117:3000/renlin/template.git'
        docker_registry = '172.26.112.47'
        docker_registry_item = 'task-publish'
        image_name = "${docker_registry_item}"
@@ -39,7 +39,7 @@ pipeline {
 					dir('./project') {
 					sh '''
 						npm install
-						npm run build:dev
+						npm run build:test
 					'''
 				}
 				}
