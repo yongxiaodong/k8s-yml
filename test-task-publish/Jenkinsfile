@@ -38,9 +38,8 @@ pipeline {
 					if ( skip == 'no' ) {
 					dir('./project') {
 					sh '''
-					    npm install --unsafe-perm -g node-sass
 						npm install --unsafe-perm
-						npm run build:test
+						npm run build:dev
 					'''
 				}
 				}
