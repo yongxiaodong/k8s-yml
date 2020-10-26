@@ -42,7 +42,7 @@ pipeline {
 					dir('./project') {
 					sh '''
 						npm install --unsafe-perm
-						npm run build:dev
+						npm run build:prod
 					'''
 				}
 				}
