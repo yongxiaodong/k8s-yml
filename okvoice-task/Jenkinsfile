@@ -5,9 +5,9 @@ pipeline {
         }
     }
    environment {
-       git_url = 'http://47.101.131.117:3000/xiaolipin1314/quanzi.git'
+       git_url = 'http://47.101.131.117:3000/huyang/okvoice-task.git'
        docker_registry = '172.26.112.47'
-       docker_registry_item = 'quanzi'
+       docker_registry_item = 'okvoice-task'
        image_name = "${docker_registry_item}"
        docker_image_fqdn = '${docker_registry}/${docker_registry_item}/${image_name}:${BUILD_ID}'
    }
@@ -32,7 +32,7 @@ pipeline {
 			}
 		}
 	  }
-	  stage('npm') {
+	  stage('mvn') {
 					//  when {
 			//     changelog '.*$'
 			//     }
@@ -41,8 +41,7 @@ pipeline {
 					if ( skip == 'no' ) {
 					dir('./project') {
 					sh '''
-						npm install --unsafe-perm
-						npm run build
+					mvn -B -DskipTests clean package
 					'''
 				}
 				}
@@ -53,6 +52,7 @@ pipeline {
 		stage('build docker image') {
 			steps {
 				dir('./project') {
+				sh 'sed -i "s/^.*ENV PROFILES_ACTIVE.*$/ENV PROFILES_ACTIVE ${PROFILES_ACTIVE_VALUE}/g" prd_Dockerfile'
 				sh """
 				docker build -t  ${docker_image_fqdn} -f prd_Dockerfile  .
 				docker login -u admin -p okvoice ${docker_registry}
@@ -67,7 +67,7 @@ pipeline {
 				dir('./project') {
 				sh 'sed -i "s/replicas:.*/replicas: ${replicas_count}/g" deploy.yml'
 				sh 'sed -i "s/\\(^.*image: \\)\\(.*$\\)/\\1${docker_registry}\\/${docker_registry_item}\\/${image_name}:${BUILD_ID}/g" deploy.yml'
-				kubernetesDeploy configs: 'deploy.yml', kubeConfig: [path: ''], kubeconfigId: '1e486a1c-7a15-425e-adf2-e114d233ded5', secretName: '', ssh: [sshCredentialsId: '*', sshServer: ''], textCredentials: [certificateAuthorityData: '', clientCertificateData: '', clientKeyData: '', serverUrl: 'https://']
+				kubernetesDeploy configs: 'deploy.yml', kubeConfig: [path: ''], kubeconfigId: 'e94c584f-510a-4b20-be41-eda4a9b35770', secretName: '', ssh: [sshCredentialsId: '*', sshServer: ''], textCredentials: [certificateAuthorityData: '', clientCertificateData: '', clientKeyData: '', serverUrl: 'https://']
 			}
 			}
 		}

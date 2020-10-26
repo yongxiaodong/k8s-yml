@@ -1,0 +1,79 @@
+#apiVersion: v1
+#kind: Namespace
+#metadata:
+#  name: okvoice-task
+#---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: okvoice-task
+  namespace: okvoice-task
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+     name: okvoice-task
+  template:
+    metadata:
+      labels:
+        name: okvoice-task
+    spec:
+      containers:
+      - name: okvoice-task
+        image: 172.26.112.47/okvoice-task/okvoice-task:94
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "2048Mi"
+          limits:
+            cpu: "4096m"
+            memory: "5128Mi"
+#        readinessProbe:
+#          httpGet:
+#            port: 9090
+#            path: /biz/circleWeb/config/getConfig
+#          initialDelaySeconds: 60
+#          periodSeconds: 3
+#        livenessProbe:
+#          httpGet:
+#            port: 9090
+#            path: /biz/circleWeb/config/getConfig
+#          initialDelaySeconds: 180
+#          periodSeconds: 3
+        volumeMounts:
+        - mountPath: /logs
+          name: logs
+      volumes:
+      - name: logs
+        persistentVolumeClaim:
+          claimName: okvoice-task-logs-1
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: okvoice-task
+  namespace: okvoice-task
+spec:
+  selector:
+    name: okvoice-task
+  ports:
+  - name: http
+    port: 80
+    targetPort: 9090
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: okvoice-task
+  namespace: okvoice-task
+spec:
+  rules:
+    - host: prd-k8s-okvoice-task.okyuyin.com
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: okvoice-task
+            servicePort: 80
