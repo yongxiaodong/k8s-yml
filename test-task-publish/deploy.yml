@@ -68,7 +68,7 @@ metadata:
   namespace: task-publish
 spec:
   rules:
-    - host: test-task-publish.okyuyin.com
+    - host: k8s-task-publish.okyuyin.com
       http:
         paths:
         - path: /
