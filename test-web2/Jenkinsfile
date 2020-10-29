@@ -1,0 +1,59 @@
+pipeline {
+    agent {
+    node {
+        label 'jenkinsbuildnode'
+        }
+    }
+   environment {
+       git_url = 'http://47.101.131.117:3000/renlin/web.git'
+       docker_registry = '172.26.112.47'
+       docker_registry_item = 'web'
+       image_name = "${docker_registry_item}"
+       docker_image_fqdn = '${docker_registry}/${docker_registry_item}/${image_name}:${BUILD_ID}'
+   }
+    stages {
+
+		stage('Pull code') {
+			steps {
+			dir('./project') {
+				checkout([$class: 'GitSCM', branches: [[name: '${branch_name}']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CheckoutOption', timeout: 20], [$class: 'CloneOption', depth: 1, noTags: false, reference: '', shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '09267d83-3027-4ac5-a940-e0e61757e48a', url: "${git_url}"]]])
+				sh """
+				    /bin/cp -fR ../${JOB_NAME}/* ./
+				    /bin/cp -fR ../${JOB_NAME}/.dockerignore ./ || exit 0
+				   """
+			}
+			}
+		}
+		
+	  stage('get_commit_msg') {
+		 steps {
+			script {
+			   env.GIT_COMMIT_MSG = sh (script: 'git log -1 --pretty=%B ${GIT_COMMIT}', returnStdout: true).trim()
+			}
+		}
+	  }
+	  stage('npm') {
+					//  when {
+			//     changelog '.*$'
+			//     }
+				steps {
+				script {
+					if ( skip == 'no' ) {
+					dir('./project/okvoice/') {
+					sh '''
+					    npm config set registry https://registry.npm.taobao.org
+						npm install --unsafe-perm
+						npm run build
+					'''
+				}
+				}
+				}
+			}
+
+		}
+
+
+
+	}
+}
+
