@@ -39,7 +39,7 @@ pipeline {
 				steps {
 				script {
 					if ( skip == 'no' ) {
-					dir('./project') {
+					dir('./project/okvoice/') {
 					sh '''
 						npm install --unsafe-perm
 						npm run build
