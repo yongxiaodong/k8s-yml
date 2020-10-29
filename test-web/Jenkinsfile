@@ -16,7 +16,7 @@ pipeline {
 		stage('Pull code') {
 			steps {
 			dir('./project') {
-				git branch: '${branch_name}', credentialsId: '09267d83-3027-4ac5-a940-e0e61757e48a', url: "${git_url}"
+				checkout([$class: 'GitSCM', branches: [[name: '${branch_name}']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CheckoutOption', timeout: 20], [$class: 'CloneOption', depth: 1, noTags: false, reference: '', shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '09267d83-3027-4ac5-a940-e0e61757e48a', url: "${git_url}"]]])
 				sh """
 				    /bin/cp -fR ../${JOB_NAME}/* ./
 				    /bin/cp -fR ../${JOB_NAME}/.dockerignore ./ || exit 0
