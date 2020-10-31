@@ -19,7 +19,7 @@ podTemplate(
             hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
             persistentVolumeClaim(claimName: 'm2', mountPath: '/root/.m2', readOnly: false),
             persistentVolumeClaim(claimName: 'jenkins-workspaces', mountPath: '/home/jenkins/agent/workspace', readOnly: false)]
-    )
+)
 pipeline {
     agent {
     node {
