@@ -13,27 +13,26 @@ spec:
   - name: jnlp
     image: 172.26.112.47/base_lib/jnlp-slave:v9
     tty: true
-	volumeMounts:
-	 - mountPath: /var/run/docker.sock
-	   name: dockersock
-	- mountPath: /root/.m2
-	  name: m2
-	- mountPath: /home/jenkins/agent/workspace
-	  name: jenkins-workspaces
+    volumeMounts:
+    - mountPath: /var/run/docker.sock
+      name: dockersock
+    - mountPath: /root/.m2
+      name: m2
+    - mountPath: /home/jenkins/agent/workspace
+      name: jenkins-workspaces
   volumes:
   - name: dockersock
     hostPath:
-	  path: "/var/run/docker.sock"
+      path: "/var/run/docker.sock"
   - name: m2
-	persistentVolumeClaim:
-	  claimName: m2
+    persistentVolumeClaim:
+      claimName: m2
   - name: jenkins-workspaces
-	persistentVolumeClaim:
-	  claimName: jenkins-workspaces
+    persistentVolumeClaim:
+      claimName: jenkins-workspaces
 """
     }
   }
-
 
    environment {
    // git_url & branch_name & PROFILES_ACTIVE_VALUE & skip & replicas_count
