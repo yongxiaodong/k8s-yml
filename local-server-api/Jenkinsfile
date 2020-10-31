@@ -35,14 +35,13 @@ spec:
   }
 
    environment {
-   // git_url & branch_name & PROFILES_ACTIVE_VALUE & skip & replicas_count
-       git_url = "${git_url}"
+   // project_git_url & project_branch_name & PROFILES_ACTIVE_VALUE & skip & replicas_count
+       project_git_url = "${project_git_url}"
        docker_registry = '192.168.2.168:5000'
        docker_registry_item = 'app'
        image_name = "${JOB_NAME}"
-       docker_image_fqdn = '${docker_registry}/${docker_registry_item}/${image_name}-${branch_name}:${BUILD_ID}'
+       docker_image_fqdn = '${docker_registry}/${docker_registry_item}/${image_name}-${project_branch_name}:${BUILD_ID}'
        git_token_id = '09267d83-3027-4ac5-a940-e0e61757e48a'
-       sub_directory = 'project'
        local_k8s_kubeconfigid = 'f8be4b66-827c-4637-bae2-7b04d9a366b0'
        pre_k8s_kubeconfigid = '1e486a1c-7a15-425e-adf2-e114d233ded5'
        prod_k8s_kubeconfigid = 'e94c584f-510a-4b20-be41-eda4a9b35770'
@@ -51,7 +50,7 @@ spec:
 		stage('Pull code') {
 			steps {
 			dir('./project') {
-				checkout([$class: 'GitSCM', branches: [[name: "${branch_name}"]], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CheckoutOption', timeout: 20], [$class: 'CloneOption', depth: 1, noTags: false, reference: '', shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: "${git_token_id}", url: "${git_url}"]]])
+				checkout([$class: 'GitSCM', branches: [[name: "${project_branch_name}"]], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CheckoutOption', timeout: 20], [$class: 'CloneOption', depth: 1, noTags: false, reference: '', shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: "${git_token_id}", url: "${project_git_url}"]]])
 				sh "/bin/cp -fR ../${JOB_NAME}/* ./"
 			}
 			}
