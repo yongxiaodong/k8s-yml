@@ -8,7 +8,6 @@ kind: Pod
 metadata:
   labels:
     some-label: jenkinsbuildnode
-	namespace: jenkins
 spec:
   containers:
   - name: jnlp
