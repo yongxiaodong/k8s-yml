@@ -20,9 +20,6 @@ podTemplate(
             persistentVolumeClaim(claimName: 'm2', mountPath: '/root/.m2', readOnly: false),
             persistentVolumeClaim(claimName: 'jenkins-workspaces', mountPath: '/home/jenkins/agent/workspace', readOnly: false)]
     ) {
-    // some block
-}
-
 
 pipeline {
     agent {
@@ -104,3 +101,4 @@ pipeline {
 	}
 }
 
+}
