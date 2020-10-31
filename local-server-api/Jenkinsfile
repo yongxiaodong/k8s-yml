@@ -46,6 +46,13 @@ spec:
        pre_k8s_kubeconfigid = '1e486a1c-7a15-425e-adf2-e114d233ded5'
        prod_k8s_kubeconfigid = 'e94c584f-510a-4b20-be41-eda4a9b35770'
    }
+    options {
+      buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '15', numToKeepStr: '15')
+    }
+    parameters {
+      string defaultValue: 'yong', description: '', name: 'testp', trim: false
+    }
+
     stages {
 		stage('Pull code') {
 			steps {
