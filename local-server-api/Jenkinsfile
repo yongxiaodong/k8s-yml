@@ -1,3 +1,29 @@
+podTemplate(
+    cloud: 'kubernetes',
+    containers: [
+        containerTemplate(
+            image: '172.26.112.47/base_lib/jnlp-slave:v9',
+            livenessProbe: containerLivenessProbe(execArgs: '', failureThreshold: 0, initialDelaySeconds: 0, periodSeconds: 0, successThreshold: 0, timeoutSeconds: 0),
+            name: 'jnlp',
+            resourceLimitCpu: '',
+            resourceLimitMemory: '',
+            resourceRequestCpu: '',
+            resourceRequestMemory: '',
+            ttyEnabled: true,
+            workingDir: '/home/jenkins/agent'
+            )],
+        label: 'jenkinsbuildnode',
+        name: 'jenkinsbuildnode',
+        namespace: 'jenkins',
+        volumes: [
+            hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
+            persistentVolumeClaim(claimName: 'm2', mountPath: '/root/.m2', readOnly: false),
+            persistentVolumeClaim(claimName: 'jenkins-workspaces', mountPath: '/home/jenkins/agent/workspace', readOnly: false)]
+    ) {
+    // some block
+}
+
+
 pipeline {
     agent {
     node {
@@ -5,18 +31,23 @@ pipeline {
         }
     }
    environment {
-       git_url = 'http://47.101.131.117:3000/okyunyin/server.git'
+   // git_url & branch_name & PROFILES_ACTIVE_VALUE & skip & replicas_count
+       git_url = "${git_url}"
        docker_registry = '192.168.2.168:5000'
-       docker_registry_item = 'server-api'
-       image_name = "${docker_registry_item}"
-       docker_image_fqdn = '${docker_registry}/${docker_registry_item}/${image_name}:${BUILD_ID}'
+       docker_registry_item = 'app'
+       image_name = "${JOB_NAME}"
+       docker_image_fqdn = '${docker_registry}/${docker_registry_item}/${image_name}-${branch_name}:${BUILD_ID}'
+       git_token_id = '09267d83-3027-4ac5-a940-e0e61757e48a'
+       sub_directory = 'project'
+       local_k8s_kubeconfigid = 'f8be4b66-827c-4637-bae2-7b04d9a366b0'
+       pre_k8s_kubeconfigid = '1e486a1c-7a15-425e-adf2-e114d233ded5'
+       prod_k8s_kubeconfigid = 'e94c584f-510a-4b20-be41-eda4a9b35770'
    }
     stages {
-
 		stage('Pull code') {
 			steps {
 			dir('./project') {
-				git branch: '${branch_name}', credentialsId: '09267d83-3027-4ac5-a940-e0e61757e48a', url: "${git_url}"
+				checkout([$class: 'GitSCM', branches: [[name: "${branch_name}"]], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CheckoutOption', timeout: 20], [$class: 'CloneOption', depth: 1, noTags: false, reference: '', shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: "${git_token_id}", url: "${git_url}"]]])
 				sh "/bin/cp -fR ../${JOB_NAME}/* ./"
 			}
 			}
@@ -64,7 +95,7 @@ pipeline {
 				dir('./project') {
 				sh 'sed -i "s/replicas:.*/replicas: ${replicas_count}/g" deploy.yml'
 				sh 'sed -i "s/\\(^.*image: \\)\\(.*$\\)/\\1${docker_registry}\\/${docker_registry_item}\\/${image_name}:${BUILD_ID}/g" deploy.yml'
-				kubernetesDeploy configs: 'deploy.yml', kubeConfig: [path: ''], kubeconfigId: 'f8be4b66-827c-4637-bae2-7b04d9a366b0', secretName: '', ssh: [sshCredentialsId: '*', sshServer: ''], textCredentials: [certificateAuthorityData: '', clientCertificateData: '', clientKeyData: '', serverUrl: 'https://']
+				kubernetesDeploy configs: 'deploy.yml', kubeconfigId: '${local_k8s_kubeconfigid}'
 			}
 			}
 		}
