@@ -1,34 +1,41 @@
 
 pipeline {
-
     agent {
-        kubernetes{
-            cloud 'kubernetes'
-            containerTemplate{
-                image '172.26.112.47/base_lib/jnlp-slave:v9'
-                name: 'jnlp'
-                }
-            label 'jenkinsbuildnode'
-            name 'jenkinsbuildnode'
-            namespace 'jenkins'
-            volumes: {
-                hostPathVolume{
-                    hostPath '/var/run/docker.sock'
-                    mountPath '/var/run/docker.sock'
-                    }
-                persistentVolumeClaim{
-                    claimName 'm2'
-                    mountPath '/root/.m2'
-                    readOnly false
-                    }
-                persistentVolumeClaim{
-                    claimName 'jenkins-workspaces'
-                    mountPath '/home/jenkins/agent/workspace'
-                    readOnly false
-                    }
-                }
-        }
+      kubernetes {
+        cloud 'kubernetes'
+        namespace 'jenkins'
+        yaml '''apiVersion: v1
+    kind: Pod
+    metadata:
+      namespace: jenkins
+      labels:
+        jenkinsbuildnode
+    spec:
+      containers:
+      - name: jnlp
+        image: 172.26.112.47/base_lib/jnlp-slave:v9
+        tty: true
+        volumeMounts:
+         - mountPath: /var/run/docker.sock
+           name: dockersock
+        - mountPath: /root/.m2
+          name: m2
+        - mountPath: /home/jenkins/agent/workspace
+          name: jenkins-workspaces
+      volumes:
+      - name: dockersock
+        hostPath:
+          path: "/var/run/docker.sock"
+      - name: m2
+        persistentVolumeClaim:
+          claimName: m2
+      - name: jenkins-workspaces
+        persistentVolumeClaim:
+          claimName: jenkins-workspaces'''
+      }
     }
+
+
    environment {
    // git_url & branch_name & PROFILES_ACTIVE_VALUE & skip & replicas_count
        git_url = "${git_url}"
