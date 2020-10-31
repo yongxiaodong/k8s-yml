@@ -1,30 +1,31 @@
-podTemplate(
-    cloud: 'kubernetes',
-    containers: [
-        containerTemplate(
-            image: '172.26.112.47/base_lib/jnlp-slave:v9',
-            livenessProbe: containerLivenessProbe(execArgs: '', failureThreshold: 0, initialDelaySeconds: 0, periodSeconds: 0, successThreshold: 0, timeoutSeconds: 0),
-            name: 'jnlp',
-            resourceLimitCpu: '',
-            resourceLimitMemory: '',
-            resourceRequestCpu: '',
-            resourceRequestMemory: '',
-            ttyEnabled: true,
-            workingDir: '/home/jenkins/agent'
-            )],
-        label: 'jenkinsbuildnode',
-        name: 'jenkinsbuildnode',
-        namespace: 'jenkins',
-        volumes: [
-            hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
-            persistentVolumeClaim(claimName: 'm2', mountPath: '/root/.m2', readOnly: false),
-            persistentVolumeClaim(claimName: 'jenkins-workspaces', mountPath: '/home/jenkins/agent/workspace', readOnly: false)]
-)
+
 pipeline {
+    podTemplate(
+        cloud: 'kubernetes',
+        containers: [
+            containerTemplate(
+                image: '172.26.112.47/base_lib/jnlp-slave:v9',
+                livenessProbe: containerLivenessProbe(execArgs: '', failureThreshold: 0, initialDelaySeconds: 0, periodSeconds: 0, successThreshold: 0, timeoutSeconds: 0),
+                name: 'jnlp',
+                resourceLimitCpu: '',
+                resourceLimitMemory: '',
+                resourceRequestCpu: '',
+                resourceRequestMemory: '',
+                ttyEnabled: true,
+                workingDir: '/home/jenkins/agent'
+                )],
+            label: 'jenkinsbuildnode',
+            name: 'jenkinsbuildnode',
+            namespace: 'jenkins',
+            volumes: [
+                hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
+                persistentVolumeClaim(claimName: 'm2', mountPath: '/root/.m2', readOnly: false),
+                persistentVolumeClaim(claimName: 'jenkins-workspaces', mountPath: '/home/jenkins/agent/workspace', readOnly: false)]
+    ){
     agent {
-    node {
-        label 'jenkinsbuildnode'
-        }
+        node {
+            label 'jenkinsbuildnode'
+            }
     }
    environment {
    // git_url & branch_name & PROFILES_ACTIVE_VALUE & skip & replicas_count
@@ -97,5 +98,6 @@ pipeline {
 		}
 
 
+	}
 	}
 }
