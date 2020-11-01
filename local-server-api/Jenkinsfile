@@ -42,6 +42,7 @@ spec:
        image_name = "${JOB_NAME}"
        docker_image_fqdn = '${docker_registry}/${docker_registry_item}/${image_name}-${project_branch_name}:${BUILD_ID}'
        git_token_id = '09267d83-3027-4ac5-a940-e0e61757e48a'
+       harbor_auth_id = '3219797e-601e-41d7-b98b-ea5abf0c7e07'
        local_k8s_kubeconfigid = 'f8be4b66-827c-4637-bae2-7b04d9a366b0'
        pre_k8s_kubeconfigid = '1e486a1c-7a15-425e-adf2-e114d233ded5'
        prod_k8s_kubeconfigid = 'e94c584f-510a-4b20-be41-eda4a9b35770'
@@ -54,7 +55,6 @@ spec:
 			steps {
 			dir('./project') {
 				checkout([$class: 'GitSCM', branches: [[name: "${project_branch_name}"]], extensions: [[$class: 'CheckoutOption', timeout: 20], [$class: 'CloneOption', depth: 1]], userRemoteConfigs: [[credentialsId: "${git_token_id}", url: "${project_git_url}"]]])
-				// git branch: '${project_branch_name}', credentialsId: '09267d83-3027-4ac5-a940-e0e61757e48a', url: "${project_git_url}"
 				sh "/bin/cp -fR ../${JOB_NAME}/* ./"
 			}
 			}
@@ -87,13 +87,15 @@ spec:
 		stage('build docker image') {
 			steps {
 				dir('./project') {
-				sh 'sed -i "s/^.*ENV PROFILES_ACTIVE.*$/ENV PROFILES_ACTIVE ${PROFILES_ACTIVE_VALUE}/g" prd_Dockerfile'
-				sh """
-				docker build -t  ${docker_image_fqdn} -f prd_Dockerfile  .
-				docker login -u admin -p okvoice ${docker_registry}
-				docker push ${docker_image_fqdn}
-				docker rmi ${docker_image_fqdn}
-				"""
+				    withCredentials([usernamePassword(credentialsId: "${harbor_auth_id}", passwordVariable: 'harbor_password', usernameVariable: 'harbor_username')]) {
+                        sh 'sed -i "s/^.*ENV PROFILES_ACTIVE.*$/ENV PROFILES_ACTIVE ${PROFILES_ACTIVE_VALUE}/g" prd_Dockerfile'
+                        sh """
+                        docker build -t  ${docker_image_fqdn} -f prd_Dockerfile  .
+                        docker login -u ${harbor_username} -p ${harbor_password} ${docker_registry}
+                        docker push ${docker_image_fqdn}
+                        docker rmi ${docker_image_fqdn}
+                        """
+                    }
 			}
 			}
 		}
