@@ -79,8 +79,7 @@ spec:
 					if ( skip == 'no' ) {
 					dir('./project') {
 					sh '''
-						npm install --unsafe-perm
-						npm run build
+						mvn -B -DskipTests clean package
 					'''
 				}
 				}
