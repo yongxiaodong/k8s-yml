@@ -49,10 +49,6 @@ spec:
     options {
       buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '15', numToKeepStr: '15')
     }
-    parameters {
-      string defaultValue: 'yong', description: '', name: 'testp', trim: false
-    }
-
     stages {
 		stage('Pull code') {
 			steps {
