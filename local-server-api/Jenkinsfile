@@ -87,21 +87,21 @@ spec:
 			}
 
 		}
-//		stage('build docker image') {
-//			steps {
-//				dir('./project') {
-//				    withCredentials([usernamePassword(credentialsId: "${harbor_auth_id}", passwordVariable: 'harbor_password', usernameVariable: 'harbor_username')]) {
-//                        sh 'sed -i "s/^.*ENV PROFILES_ACTIVE.*$/ENV PROFILES_ACTIVE ${PROFILES_ACTIVE_VALUE}/g" prd_Dockerfile'
-//                        sh """
-//                        docker build -t  ${docker_image_fqdn} -f prd_Dockerfile  .
+		stage('build docker image') {
+			steps {
+				dir('./project') {
+				    withCredentials([usernamePassword(credentialsId: "${harbor_auth_id}", passwordVariable: 'harbor_password', usernameVariable: 'harbor_username')]) {
+                        sh 'sed -i "s/^.*ENV PROFILES_ACTIVE.*$/ENV PROFILES_ACTIVE ${PROFILES_ACTIVE_VALUE}/g" prd_Dockerfile'
+                        sh """
+                        docker build -t  ${docker_image_fqdn} -f prd_Dockerfile  .
 //                        docker login -u ${harbor_username} -p ${harbor_password} ${docker_registry}
 //                        docker push ${docker_image_fqdn}
 //                        docker rmi ${docker_image_fqdn}
-//                        """
-//                    }
-//			}
-//			}
-//		}
+                        """
+                    }
+			}
+			}
+		}
 		stage('deploy') {
 			steps {
 				dir('./project') {
