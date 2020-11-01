@@ -70,7 +70,7 @@ spec:
 			}
 		}
 	  }
-	  stage('mvn') {
+	  stage('npm') {
 					//  when {
 			//     changelog '.*$'
 			//     }
@@ -79,7 +79,7 @@ spec:
 					if ( skip == 'no' ) {
 					dir('./project') {
 					sh '''
-					mvn -B -DskipTests clean package
+						mvn -B -DskipTests clean package
 					'''
 				}
 				}
