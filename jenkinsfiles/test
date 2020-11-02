@@ -47,7 +47,7 @@ spec:
        docker_registry = '192.168.2.168:5000'
        docker_registry_item = 'app'
        image_name = "${JOB_NAME}"
-       primary-domain = '.local.okyuyin.com'
+       primary_domain = '.local.okyuyin.com'
        docker_image_fqdn = '${docker_registry}/${docker_registry_item}/${image_name}-${project_branch_name}:${BUILD_ID}'
        git_token_id = '09267d83-3027-4ac5-a940-e0e61757e48a'
        harbor_auth_id = '3219797e-601e-41d7-b98b-ea5abf0c7e07'
@@ -83,7 +83,7 @@ spec:
 		 steps {
 			script {
 			   env.project_name = url.tokenize('/')[-1].tokenize('.')[0]
-			   env.fqdn_domain = "${project_branch_name}" + '-' + "${env.project_name}" + "${primary-domain}"
+			   env.fqdn_domain = "${project_branch_name}" + '-' + "${env.project_name}" + "${primary_domain}"
 			   echo "url地址:${env.fqdn_domain}"
 			}
 		}
