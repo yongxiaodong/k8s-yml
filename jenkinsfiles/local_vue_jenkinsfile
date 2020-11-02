@@ -33,13 +33,13 @@ spec:
 """
     }
   }
-parameters {
-  string defaultValue: 'http://47.101.131.117:3000/renlin/quanzi.git', description: '项目的git地址', name: 'project_git_url_template', trim: false
-  string defaultValue: 'dev', description: '分支名', name: 'project_branch_name_template', trim: false
-  choice choices: ['no', 'yes'], description: '是否跳过npm阶段', name: 'skip_template'
-  string defaultValue: '1', description: '要运行的副本数量', name: 'replicas_count_template', trim: false
-  string defaultValue: 'npm run build', description: '要执行的npm打包命令', name: 'build_command_template', trim: false
-}
+// parameters {
+//  string defaultValue: 'http://47.101.131.117:3000/renlin/quanzi.git', description: '项目的git地址', name: 'project_git_url_template', trim: false
+//  string defaultValue: 'dev', description: '分支名', name: 'project_branch_name_template', trim: false
+//  choice choices: ['no', 'yes'], description: '是否跳过npm阶段', name: 'skip_template'
+//  string defaultValue: '1', description: '要运行的副本数量', name: 'replicas_count_template', trim: false
+//  string defaultValue: 'npm run build', description: '要执行的npm打包命令', name: 'build_command_template', trim: false
+// }
 
    environment {
    // p: project_branch_name & skip & replicas_count & build_command
