@@ -41,6 +41,7 @@ spec:
        docker_registry_item = 'app'
        image_name = "${JOB_NAME}"
        docker_image_fqdn = '${docker_registry}/${docker_registry_item}/${image_name}-${project_branch_name}:${BUILD_ID}'
+       build_command = "build_command"
        git_token_id = '09267d83-3027-4ac5-a940-e0e61757e48a'
        harbor_auth_id = '3219797e-601e-41d7-b98b-ea5abf0c7e07'
        local_k8s_kubeconfigid = 'f8be4b66-827c-4637-bae2-7b04d9a366b0'
@@ -78,11 +79,11 @@ spec:
 				script {
 					if ( skip == 'no' ) {
 					dir('./project') {
-					sh '''
+					sh """
                         npm config set registry https://registry.npm.taobao.org
                         npm install --unsafe-perm
-                        npm run build
-					'''
+                        ${build_command}
+					"""
 				}
 				}
 				}
