@@ -85,6 +85,7 @@ spec:
 			   env.project_name = project_git_url.tokenize('/')[-1].tokenize('.')[0]
 			   env.namespace = "${project_branch_name}" + '-' + "${env.project_name}"
 			   env.fqdn_domain = "${env.namespace}" + "${primary_domain}"
+			   env.testid = 'dddddddddddddd'
 			   echo "url地址:${env.fqdn_domain}"
 			}
 		}
@@ -130,7 +131,7 @@ spec:
 				echo "${env.namespace}"
 				echo "${env.fqdn_domain}"
 				sh 'sed -i "s/replicas:.*/replicas: ${replicas_count}/g" deploy.yml'
-				sh 'sed -i "0,/name:.*/ s//name: ${env.namespace}/" deploy.yml'
+				sh 'sed -i "0,/name:.*/ s//name: ${env.testid}/" deploy.yml'
 			}
 			}
 		}
