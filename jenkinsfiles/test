@@ -127,13 +127,9 @@ spec:
 			steps {
 				dir('./project') {
 				sh '''
-				    # 修改创建的ns名称
 				    sed -i "0,/name:.*/ s//name: ${env.project_name}/" deploy.yml
-				    # 修改文件类所有的ns名称
 				    sed -i "s/namespace:.*/namespace: ${env.project_name}/g" deploy.yml
-				    # 修改ingress访问域名
 				    sed -i "s/host:.*/host: ${env.fqdn_domain}/g" deploy.yml
-				    # 修改副本数量
 				    sed -i "s/replicas:.*/replicas: ${replicas_count}/g" deploy.yml
 				    '''
 				sh 'sed -i "s/\\(^.*image: \\)\\(.*$\\)/\\1${docker_registry}\\/${docker_registry_item}\\/${image_name}-${project_branch_name}:${BUILD_ID}/g" deploy.yml'
