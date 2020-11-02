@@ -135,7 +135,7 @@ spec:
                    fqdn_domain = "${namespace}" + "${primary_domain}"
                    echo "url地址:${fqdn_domain}"
                     sh 'sed -i "s/replicas:.*/replicas: ${replicas_count}/g" deploy.yml'
-                    sh 'sed -i "0,/name:.*/ s//name: namespace/" deploy.yml'
+                    sh 'sed -i "0,/name:.*/ s//name: ${namespace}/" deploy.yml'
 				}
 			}
 			}
