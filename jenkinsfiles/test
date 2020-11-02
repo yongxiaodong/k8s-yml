@@ -134,7 +134,9 @@ spec:
                    namespace = "${project_branch_name}" + '-' + "${env.project_name}"
                    fqdn_domain = "${namespace}" + "${primary_domain}"
                    echo "url地址:${fqdn_domain}"
+
                     sh 'sed -i "0,/name:.*/ s//name: ${namespace}/" deploy.yml'
+                    sh 'sed -i "s/namespace:.*/namespace: ${namespace}/g" deploy.yml'
                     sh 'sed -i "s/host:.*/host: ${fqdn_domain}/g" deploy.yml'
                     sh 'sed -i "s/replicas:.*/replicas: ${replicas_count}/g" deploy.yml'
                     sh 'sed -i "s/\\(^.*image: \\)\\(.*$\\)/\\1${docker_registry}\\/${docker_registry_item}\\/${image_name}-${project_branch_name}:${BUILD_ID}/g" deploy.yml'
