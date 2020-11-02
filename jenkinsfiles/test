@@ -126,10 +126,7 @@ spec:
 		stage('deploy') {
 			steps {
 				dir('./project') {
-
-				    sh 'sed -i "s/namespace:.*/namespace: ${env.project_name}/g" deploy.yml'
-				    					sh 'sed -i "0,/name:.*/ s//name: ${env.project_name}/" deploy.yml'
-				    sh 'sed -i "s/host:.*/host: ${env.fqdn_domain}/g" deploy.yml'
+				sh 'sed -i "s/namespace:.*/namespace: ${env.project_name}/g" deploy.yml'
 				sh 'sed -i "s/replicas:.*/replicas: ${replicas_count}/g" deploy.yml'
 				sh 'sed -i "s/\\(^.*image: \\)\\(.*$\\)/\\1${docker_registry}\\/${docker_registry_item}\\/${image_name}-${project_branch_name}:${BUILD_ID}/g" deploy.yml'
 				kubernetesDeploy configs: 'deploy.yml', kubeconfigId: 'f8be4b66-827c-4637-bae2-7b04d9a366b0'
