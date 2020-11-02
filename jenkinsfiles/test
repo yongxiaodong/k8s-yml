@@ -83,7 +83,8 @@ spec:
 		 steps {
 			script {
 			   env.project_name = project_git_url.tokenize('/')[-1].tokenize('.')[0]
-			   env.fqdn_domain = "${project_branch_name}" + '-' + "${env.project_name}" + "${primary_domain}"
+			   env.namespace = "${project_branch_name}" + '-' + "${env.project_name}"
+			   env.fqdn_domain = ${env.namespace} + "${primary_domain}"
 			   echo "url地址:${env.fqdn_domain}"
 			}
 		}
@@ -126,8 +127,11 @@ spec:
 		stage('deploy') {
 			steps {
 				dir('./project') {
-				echo "${env.project_name}"
-				sh 'sed -i "s/namespace:.*/namespace: ${env.project_name}/g" deploy.yml'
+				echo "${env.namespace}"
+				sh 'sed -i "s/namespace:.*/namespace: ${env.namespace}/g" deploy.yml'
+
+				    sh 'sed -i "0,/name:.*/ s//name: ${env.namespace}/" deploy.yml'
+				    sh 'sed -i "s/host:.*/host: ${env.fqdn_domain}/g" deploy.yml'
 				sh 'sed -i "s/replicas:.*/replicas: ${replicas_count}/g" deploy.yml'
 				sh 'sed -i "s/\\(^.*image: \\)\\(.*$\\)/\\1${docker_registry}\\/${docker_registry_item}\\/${image_name}-${project_branch_name}:${BUILD_ID}/g" deploy.yml'
 				kubernetesDeploy configs: 'deploy.yml', kubeconfigId: 'f8be4b66-827c-4637-bae2-7b04d9a366b0'
