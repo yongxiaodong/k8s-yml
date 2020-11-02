@@ -33,10 +33,6 @@ spec:
 """
     }
   }
-  parameters {
-    string defaultValue: 'b', description: '分支', name: 'yxd', trim: false
-    }
-
 
    environment {
    // p: project_branch_name & PROFILES_ACTIVE_VALUE & skip & replicas_count & k8s_kubeconfig_auth & harbor_auth_id
