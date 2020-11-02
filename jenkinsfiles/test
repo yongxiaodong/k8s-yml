@@ -34,24 +34,27 @@ spec:
     }
   }
 // parameters {
-//  string defaultValue: 'http://47.101.131.117:3000/okyunyin/server.git', description: '项目的git地址', name: 'project_git_url_template', trim: false
+//  string defaultValue: 'http://47.101.131.117:3000/renlin/quanzi.git', description: '项目的git地址', name: 'project_git_url_template', trim: false
 //  string defaultValue: 'dev', description: '分支名', name: 'project_branch_name_template', trim: false
-//  string defaultValue: 'biz-test', description: '启动参数', name: 'PROFILES_ACTIVE_VALUE_template', trim: false
-//  choice choices: ['no', 'yes'], description: '是否跳过mvn阶段', name: 'skip_template'
+//  choice choices: ['no', 'yes'], description: '是否跳过npm阶段', name: 'skip_template'
 //  string defaultValue: '1', description: '要运行的副本数量', name: 'replicas_count_template', trim: false
+//  string defaultValue: 'npm run build', description: '要执行的npm打包命令', name: 'build_command_template', trim: false
 // }
 
    environment {
-   // para: project_branch_name & PROFILES_ACTIVE_VALUE & skip & replicas_count & k8s_kubeconfig_auth & harbor_auth_id
+   // p: project_branch_name & skip & replicas_count & build_command
+   // k8s_kubeconfig_auth & harbor_auth_id
        docker_registry = '192.168.2.168:5000'
        docker_registry_item = 'app'
        image_name = "${JOB_NAME}"
+       primary-domain = '.local.okyuyin.com'
        docker_image_fqdn = '${docker_registry}/${docker_registry_item}/${image_name}-${project_branch_name}:${BUILD_ID}'
        git_token_id = '09267d83-3027-4ac5-a940-e0e61757e48a'
        harbor_auth_id = '3219797e-601e-41d7-b98b-ea5abf0c7e07'
        local_k8s_kubeconfigid = 'f8be4b66-827c-4637-bae2-7b04d9a366b0'
        pre_k8s_kubeconfigid = '1e486a1c-7a15-425e-adf2-e114d233ded5'
        prod_k8s_kubeconfigid = 'e94c584f-510a-4b20-be41-eda4a9b35770'
+
    }
     options {
       buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '15', numToKeepStr: '15')
@@ -76,7 +79,17 @@ spec:
 			}
 		}
 	  }
-	  stage('mvn') {
+	  stage('生成URL') {
+		 steps {
+			script {
+			   env.project_name = url.tokenize('/')[-1].tokenize('.')[0]
+			   env.fqdn_domain = "${project_branch_name}" + '-' + "${env.project_name}" + "${primary-domain}"
+			   echo "url地址:${env.fqdn_domain}"
+			}
+		}
+	  }
+
+	  stage('npm') {
 					//  when {
 			//     changelog '.*$'
 			//     }
@@ -84,9 +97,11 @@ spec:
 				script {
 					if ( skip == 'no' ) {
 					dir('./project') {
-					sh '''
-						mvn -B -DskipTests clean package
-					'''
+					sh """
+                        npm config set registry https://registry.npm.taobao.org
+                        npm install --unsafe-perm
+                        ${build_command}
+					"""
 				}
 				}
 				}
