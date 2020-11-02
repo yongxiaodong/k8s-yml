@@ -126,6 +126,7 @@ spec:
 		stage('deploy') {
 			steps {
 				dir('./project') {
+				echo "${env.project_name}"
 				sh 'sed -i "s/namespace:.*/namespace: ${env.project_name}/g" deploy.yml'
 				sh 'sed -i "s/replicas:.*/replicas: ${replicas_count}/g" deploy.yml'
 				sh 'sed -i "s/\\(^.*image: \\)\\(.*$\\)/\\1${docker_registry}\\/${docker_registry_item}\\/${image_name}-${project_branch_name}:${BUILD_ID}/g" deploy.yml'
