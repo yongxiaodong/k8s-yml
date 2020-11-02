@@ -128,6 +128,8 @@ spec:
 			steps {
 				dir('./project') {
 				echo "${env.namespace}"
+				echo "${env.fqdn_domain}"
+				sh 'sed -i "s/host:.*/host: ${env.fqdn_domain}/g" deploy.yml'
 				sh 'sed -i "s/replicas:.*/replicas: ${replicas_count}/g" deploy.yml'
 			}
 			}
