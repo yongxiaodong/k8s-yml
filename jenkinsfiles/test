@@ -128,7 +128,7 @@ spec:
 			steps {
 				dir('./project') {
 				echo "${env.namespace}"
-				sh 'sed -i "s/namespace:.*/namespace: "${env.namespace}"/g" deploy.yml'
+				sh 'sed -i "s/replicas:.*/replicas: ${replicas_count}/g" deploy.yml'
 			}
 			}
 		}
