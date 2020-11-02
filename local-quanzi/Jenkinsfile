@@ -36,7 +36,7 @@ spec:
 
    environment {
    // p: project_branch_name & PROFILES_ACTIVE_VALUE & skip & replicas_count & k8s_kubeconfig_auth & harbor_auth_id
-       project_git_url = 'http://47.101.131.117:3000/xiaolipin1314/quanzi.git'
+       project_git_url = 'http://47.101.131.117:3000/renlin/quanzi.git'
        docker_registry = '192.168.2.168:5000'
        docker_registry_item = 'app'
        image_name = "${JOB_NAME}"
