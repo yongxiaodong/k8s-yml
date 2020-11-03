@@ -80,7 +80,7 @@ spec:
 		}
 	  }
 
-	  stage('npm打包') {
+	  stage('mvn打包') {
 					//  when {
 			//     changelog '.*$'
 			//     }

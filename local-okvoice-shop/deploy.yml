@@ -59,7 +59,7 @@ spec:
   ports:
   - name: http
     port: 80
-    targetPort: 8000
+    targetPort: 9000
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
