@@ -133,19 +133,30 @@ spec:
                    project_name = project_git_url.tokenize('/')[-1].tokenize('.')[0]
                    namespace = "${project_branch_name}" + '-' + "${env.project_name}"
                    fqdn_domain = "${namespace}" + "${primary_domain}"
-                   echo "url地址:${fqdn_domain}"
-
-                    sh 'sed -i "0,/name:.*/ s//name: ${namespace}/" deploy.yml'
-                    sh 'sed -i "s/namespace:.*/namespace: ${namespace}/g" deploy.yml'
-                    sh 'sed -i "s/host:.*/host: ${fqdn_domain}/g" deploy.yml'
-                    sh 'sed -i "s/replicas:.*/replicas: ${replicas_count}/g" deploy.yml'
-                    sh 'sed -i "s/\\(^.*image: \\)\\(.*$\\)/\\1${docker_registry}\\/${docker_registry_item}\\/${image_name}-${project_branch_name}:${BUILD_ID}/g" deploy.yml'
+                   env.fqdn_domain = "${fqdn_domain}"
+                   sh '''
+                       sed -i "0,/name:.*/ s//name: ${namespace}/" deploy.yml
+                       sed -i "s/namespace:.*/namespace: ${namespace}/g" deploy.yml
+                       sed -i "s/host:.*/host: ${fqdn_domain}/g" deploy.yml
+                       sed -i "s/replicas:.*/replicas: ${replicas_count}/g" deploy.yml
+                       sed -i "s/\\(^.*image: \\)\\(.*$\\)/\\1${docker_registry}\\/${docker_registry_item}\\/${image_name}-${project_branch_name}:${BUILD_ID}/g" deploy.yml
+                   '''
 
 				}
 				kubernetesDeploy configs: 'deploy.yml', kubeconfigId: 'f8be4b66-827c-4637-bae2-7b04d9a366b0'
+				echo "debuginfo：url地址:${fqdn_domain} 名称空间:${namespace} 镜像:${docker_image_fqdn}"
 			}
 			}
 		}
+		stage('生成URL访问地址') {
+			steps {
+			    echo "访问地址:${env.fqdn_domain}"
+			}
+		}
+
+
+
+
 	}
 
 }
