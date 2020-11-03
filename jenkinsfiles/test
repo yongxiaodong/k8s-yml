@@ -120,7 +120,7 @@ spec:
 
 				script {
                    project_name = project_git_url.tokenize('/')[-1].tokenize('.')[0]
-                   namespace = "${project_branch_name}" + '-' + "${env.project_name}"
+                   namespace = "${project_branch_name}" + '-' + "${project_name}"
                    fqdn_domain = "${namespace}" + "${primary_domain}"
                    env.fqdn_domain = "${fqdn_domain}"
                    sh '''
