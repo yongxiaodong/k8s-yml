@@ -117,7 +117,6 @@ spec:
 		stage('部署应用') {
 			steps {
 				dir('./project') {
-
 				script {
                    project_name = project_git_url.tokenize('/')[-1].tokenize('.')[0]
                    namespace = "${project_branch_name}" + '-' + "${project_name}"
@@ -125,7 +124,6 @@ spec:
                    env.fqdn_domain = "${fqdn_domain}"
                    echo "${namespaces}"
                    sh '''
-                       echo "${namespace}"
                        sed -i "0,/name:.*/ s//name: ${namespace}/" deploy.yml
                        sed -i "s/namespace:.*/namespace: ${namespace}/g" deploy.yml
                        sed -i "s/host:.*/host: ${fqdn_domain}/g" deploy.yml
