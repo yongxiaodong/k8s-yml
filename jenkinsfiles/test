@@ -48,7 +48,7 @@ spec:
        docker_registry_item = 'app'
        image_name = "${JOB_NAME}"
        primary_domain = '.local.okyuyin.com'
-       docker_image_fqdn = '${docker_registry}/${docker_registry_item}/${image_name}-${project_branch_name}:${BUILD_ID}'
+       docker_image_fqdn = "${docker_registry}/${docker_registry_item}/${image_name}-${project_branch_name}:${BUILD_ID}"
        git_token_id = '09267d83-3027-4ac5-a940-e0e61757e48a'
        harbor_auth_id = '3219797e-601e-41d7-b98b-ea5abf0c7e07'
        local_k8s_kubeconfigid = 'f8be4b66-827c-4637-bae2-7b04d9a366b0'
@@ -139,11 +139,12 @@ spec:
                        sed -i "s/namespace:.*/namespace: ${namespace}/g" deploy.yml
                        sed -i "s/host:.*/host: ${fqdn_domain}/g" deploy.yml
                        sed -i "s/replicas:.*/replicas: ${replicas_count}/g" deploy.yml
-                       sed -i "s/\\(^.*image: \\)\\(.*$\\)/\\1${docker_registry}\\/${docker_registry_item}\\/${image_name}-${project_branch_name}:${BUILD_ID}/g" deploy.yml
+                       # sed -i "s/\\(^.*image: \\)\\(.*$\\)/\\1${docker_registry}\\/${docker_registry_item}\\/${image_name}-${project_branch_name}:${BUILD_ID}/g" deploy.yml
+                       sed -i "s/\\(^.*image: \\)\\(.*$\\)/\\1${docker_registry}\\/${docker_image_fqdn}/g" deploy.yml
                    '''
 
 				}
-				kubernetesDeploy configs: 'deploy.yml', kubeconfigId: 'f8be4b66-827c-4637-bae2-7b04d9a366b0'
+				// kubernetesDeploy configs: 'deploy.yml', kubeconfigId: 'f8be4b66-827c-4637-bae2-7b04d9a366b0'
 				echo "debuginfo：url地址:${fqdn_domain} 名称空间:${namespace} 镜像:${docker_image_fqdn}"
 			}
 			}
