@@ -140,7 +140,7 @@ spec:
                        sed -i "s/host:.*/host: ${fqdn_domain}/g" deploy.yml
                        sed -i "s/replicas:.*/replicas: ${replicas_count}/g" deploy.yml
                        # sed -i "s/\\(^.*image: \\)\\(.*$\\)/\\1${docker_registry}\\/${docker_registry_item}\\/${image_name}-${project_branch_name}:${BUILD_ID}/g" deploy.yml
-                       sed -i "s/\\(^.*image: \\)\\(.*$\\)/\\1${docker_image_fqdn}/g" deploy.yml
+                       sed -i "s#image: .*#image: ${docker_image_fqdn}#g" deploy.yml
                    '''
 
 				}
