@@ -138,7 +138,7 @@ spec:
 		}
 		stage('生成URL访问地址') {
 			steps {
-			    echo "访问地址: http://${env.fqdn_domain}"
+			    echo "访问地址:  ${env.fqdn_domain}"
 			}
 		}
 
