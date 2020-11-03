@@ -125,7 +125,7 @@ spec:
                    env.fqdn_domain = "${fqdn_domain}"
                    echo "debuginfo：url地址:${fqdn_domain} 名称空间:${namespace} 镜像:${docker_image_fqdn}"
                    sh 'sed -i "0,/name:.*/ s//name: ${namespace}/" deploy.yml'
-                   sh 'sed -i "s/namespace:.*/namespace: ${namespace}/g" deploy.yml'
+                   sh 'sed -i "s#namespace:.*#namespace: ${namespace}#g" deploy.yml'
                    sh '''
 
 
