@@ -130,9 +130,9 @@ spec:
                        # 替换.为-
                        sed -i '0,/name: .*/ s/\\./-/g' deploy.yml
                        sed -i '/namespace: .*/ s/\\./-/g' deploy.yml
-                       # 替换/为-
-                       sed -i '0,/name: .*/ s/\\//-/g' deploy.yml
-                       sed -i '/namespace: .*/ s/\\//-/g' deploy.yml
+                       # 替换_为-
+                       sed -i '0,/name: .*/ s/_/-/g' deploy.yml
+                       sed -i '/namespace: .*/ s/_/-/g' deploy.yml
                    """
 
 				}
