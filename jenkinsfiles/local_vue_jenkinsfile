@@ -128,6 +128,10 @@ spec:
                        sed -i "s/host:.*/host: ${fqdn_domain}/g" deploy.yml
                        sed -i "s/replicas:.*/replicas: ${replicas_count}/g" deploy.yml
                        sed -i "s#image: .*#image: ${docker_image_fqdn}#g" deploy.yml
+
+                       # 替换.为-
+                       sed -i '0,/name:.*/ s/\\./-/g' deploy.yml
+                       sed -i '/namespace:.*/ s/\\./-/g' deploy.yml
                    """
 
 				}
