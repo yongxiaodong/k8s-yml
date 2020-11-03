@@ -122,14 +122,13 @@ spec:
                    namespace = "${project_branch_name}" + '-' + "${project_name}"
                    fqdn_domain = "${namespace}" + "${primary_domain}"
                    env.fqdn_domain = "${fqdn_domain}"
-                   echo "${namespace}"
-                   sh '''
+                   sh """
                        sed -i "0,/name:.*/ s//name: ${namespace}/" deploy.yml
                        sed -i "s/namespace:.*/namespace: ${namespace}/g" deploy.yml
                        sed -i "s/host:.*/host: ${fqdn_domain}/g" deploy.yml
                        sed -i "s/replicas:.*/replicas: ${replicas_count}/g" deploy.yml
                        sed -i "s#image: .*#image: ${docker_image_fqdn}#g" deploy.yml
-                   '''
+                   """
 
 				}
 				// kubernetesDeploy configs: 'deploy.yml', kubeconfigId: 'f8be4b66-827c-4637-bae2-7b04d9a366b0'
