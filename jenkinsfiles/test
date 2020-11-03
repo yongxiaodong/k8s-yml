@@ -131,7 +131,7 @@ spec:
                    """
 
 				}
-				// kubernetesDeploy configs: 'deploy.yml', kubeconfigId: 'f8be4b66-827c-4637-bae2-7b04d9a366b0'
+				kubernetesDeploy configs: 'deploy.yml', kubeconfigId: 'f8be4b66-827c-4637-bae2-7b04d9a366b0'
 				echo "debuginfo：url地址:${fqdn_domain} 名称空间:${namespace} 镜像:${docker_image_fqdn}"
 			}
 			}
