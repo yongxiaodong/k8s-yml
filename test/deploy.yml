@@ -96,7 +96,7 @@ spec:
         image: 172.26.112.47/quanzi/quanzi:1
         resources:
           requests:
-            cpu: "100m"
+            cpu: "10m"
             memory: "512Mi"
           limits:
             cpu: "2048m"

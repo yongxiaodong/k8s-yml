@@ -42,7 +42,7 @@ spec:
 // }
 
    environment {
-   // p: project_branch_name & skip & replicas_count & build_command
+   // 接收参数-必须: project_branch_name & skip & replicas_count & build_command
    // k8s_kubeconfig_auth & harbor_auth_id
        docker_registry = '192.168.2.168:5000'
        docker_registry_item = 'app'
@@ -60,7 +60,7 @@ spec:
       buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '15', numToKeepStr: '15')
     }
     stages {
-		stage('Pull code') {
+		stage('拉取代码') {
 			steps {
 			dir('./project') {
 				checkout([$class: 'GitSCM', branches: [[name: "${project_branch_name}"]], extensions: [[$class: 'CheckoutOption', timeout: 20], [$class: 'CloneOption', depth: 1]], userRemoteConfigs: [[credentialsId: "${git_token_id}", url: "${project_git_url}"]]])
@@ -79,19 +79,8 @@ spec:
 			}
 		}
 	  }
-	  stage('生成URL') {
-		 steps {
-			script {
-			   env.project_name = project_git_url.tokenize('/')[-1].tokenize('.')[0]
-			   env.namespace = "${project_branch_name}" + '-' + "${env.project_name}"
-			   env.fqdn_domain = "${env.namespace}" + "${primary_domain}"
-			   env.testid = 'dddddddddddddd'
-			   echo "url地址:${env.fqdn_domain}"
-			}
-		}
-	  }
 
-	  stage('npm') {
+	  stage('npm打包') {
 					//  when {
 			//     changelog '.*$'
 			//     }
@@ -110,7 +99,7 @@ spec:
 			}
 
 		}
-		stage('build docker image') {
+		stage('Docker镜像制作与推送') {
 			steps {
 				dir('./project') {
 				    withCredentials([usernamePassword(credentialsId: "${harbor_auth_id}", passwordVariable: 'harbor_password', usernameVariable: 'harbor_username')]) {
@@ -125,7 +114,7 @@ spec:
 			}
 			}
 		}
-		stage('deploy') {
+		stage('部署应用') {
 			steps {
 				dir('./project') {
 
@@ -144,19 +133,16 @@ spec:
                    '''
 
 				}
-				// kubernetesDeploy configs: 'deploy.yml', kubeconfigId: 'f8be4b66-827c-4637-bae2-7b04d9a366b0'
+				kubernetesDeploy configs: 'deploy.yml', kubeconfigId: 'f8be4b66-827c-4637-bae2-7b04d9a366b0'
 				echo "debuginfo：url地址:${fqdn_domain} 名称空间:${namespace} 镜像:${docker_image_fqdn}"
 			}
 			}
 		}
 		stage('生成URL访问地址') {
 			steps {
-			    echo "访问地址:${env.fqdn_domain}"
+			    echo "访问地址: ${env.fqdn_domain}"
 			}
 		}
-
-
-
 
 	}
 
