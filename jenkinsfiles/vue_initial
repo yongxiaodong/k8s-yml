@@ -46,10 +46,4 @@ spec:
     }
 
 
-		stage('初始化') {
-			steps {
-			    echo "OK"
-			}
-		}
-
 	}
