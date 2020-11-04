@@ -42,12 +42,10 @@ spec:
 // }
 
    environment {
-   // 接收参数-必须: project_branch_name & skip & replicas_count & build_command
-   // k8s_kubeconfig_auth & harbor_auth_id
-       docker_registry = '192.168.2.168:5000'
+       docker_registry = '172.26.112.47'
        docker_registry_item = 'app'
        image_name = "${JOB_NAME}"
-       primary_domain = '.local.okyuyin.com'
+       primary_domain = '.prod.okyuyin.com'
        docker_image_fqdn = "${docker_registry}/${docker_registry_item}/${image_name}-${project_branch_name}:${BUILD_ID}"
        git_token_id = '09267d83-3027-4ac5-a940-e0e61757e48a'
        harbor_auth_id = '3219797e-601e-41d7-b98b-ea5abf0c7e07'
@@ -105,9 +103,9 @@ spec:
 				    withCredentials([usernamePassword(credentialsId: "${harbor_auth_id}", passwordVariable: 'harbor_password', usernameVariable: 'harbor_username')]) {
                         sh """
                         docker build -t  ${docker_image_fqdn} -f prd_Dockerfile  .
-                        # docker login -u ${harbor_username} -p ${harbor_password} ${docker_registry}
-                        # docker push ${docker_image_fqdn}
-                        # docker rmi ${docker_image_fqdn}
+                        docker login -u ${harbor_username} -p ${harbor_password} ${docker_registry}
+                        docker push ${docker_image_fqdn}
+                        docker rmi ${docker_image_fqdn}
                         """
                     }
 			}
@@ -140,7 +138,7 @@ spec:
                    """
 
 				}
-				kubernetesDeploy configs: 'deploy.yml', kubeconfigId: 'f8be4b66-827c-4637-bae2-7b04d9a366b0'
+				kubernetesDeploy configs: 'deploy.yml', kubeconfigId: 'e94c584f-510a-4b20-be41-eda4a9b35770'
 				echo "debuginfo：url地址:${fqdn_domain} 名称空间:${namespace} 镜像:${docker_image_fqdn} 注意：namespace名称已经将.替换为-"
 			}
 			}
