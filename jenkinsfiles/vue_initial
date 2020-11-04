@@ -44,6 +44,15 @@ spec:
     options {
       buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '15', numToKeepStr: '15')
     }
+        stages {
+      stage('success') {
+        steps {
+            echo "ok"
+        }
+      }
+
+    }
 
 
-	}
+
+}
