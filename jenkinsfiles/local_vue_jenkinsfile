@@ -122,7 +122,7 @@ spec:
                    fqdn_domain = "${namespace}" + "${primary_domain}"
                    env.fqdn_domain = "${fqdn_domain}"
                    sh """
-                       /bin/mv -f deploy.yml deploy_old.yml
+                       /bin/cp -f deploy.yml deploy_old.yml
                        # 替换创建的namespace名称
                        sed -i "0,/name:.*/ s//name: ${namespace}/" deploy.yml
                        # 替换全局namespace名称
