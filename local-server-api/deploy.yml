@@ -21,11 +21,9 @@ spec:
       containers:
       - name: server-api
         image: 172.26.112.47/server-api/server-api:94
-        ports:
-        - containerPort: 9090
         resources:
           requests:
-            cpu: "50m"
+            cpu: "200m"
             memory: "2048Mi"
           limits:
             cpu: "4096m"
@@ -61,7 +59,7 @@ spec:
   ports:
   - name: http
     port: 80
-    targetPort: 8001
+    targetPort: 8000
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
