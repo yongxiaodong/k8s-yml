@@ -41,7 +41,7 @@ data:
             '"x-forward-for": "$http_x_forwarded_for", '
             '"upstream_addr": "$upstream_addr",'
             '"request_id": "$http_x_request_id",'
-            '"ups_resp_time": "$upstream_response_time" }';
+            '"upstream_response_time": $upstream_response_time }';
 
 
         access_log  /var/log/nginx/access.log  json;
