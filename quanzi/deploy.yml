@@ -39,9 +39,9 @@ data:
             '"body_bytes_sent":$body_bytes_sent, '
             '"http_user_agent": "$http_user_agent", '
             '"x-forward-for": "$http_x_forwarded_for", '
-            '"upstream_addr": "$upstream_addr",'
+            '"upstr_addr": "$upstream_addr",'
             '"request_id": "$http_x_request_id",'
-            '"upstream_response_time": "$upstream_response_time" }';
+            '"ups_resp_time": "$upstream_response_time" }';
 
 
         access_log  /var/log/nginx/access.log  json;
