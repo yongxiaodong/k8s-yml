@@ -27,6 +27,8 @@ data:
         large_client_header_buffers 4 32k;
         client_max_body_size 1024m;
 
+
+
          log_format json '{ "access_time": "$time_iso8601", '
             '"remote_addr": "$remote_addr", '
             '"http_referrer": "$http_referer", '
@@ -39,7 +41,7 @@ data:
             '"x-forward-for": "$http_x_forwarded_for", '
             '"upstream_addr": "$upstream_addr",'
             '"request_id": "$http_x_request_id",'
-            '"upstream_response_time": "$upstream_response_time" }';
+            '"ups_resp_time": "$upstream_response_time" }';
 
 
         access_log  /var/log/nginx/access.log  json;
