@@ -28,9 +28,10 @@ data:
         client_max_body_size 1024m;
 
 
-         log_format json '{ "@timestamp": "$time_iso8601", '
+
+         log_format json '{ "access_time": "$time_iso8601", '
             '"remote_addr": "$remote_addr", '
-            '"referer": "$http_referer", '
+            '"http_referrer": "$http_referer", '
             '"request": "$request", '
             '"status": $status, '
             '"bytes":$body_bytes_sent, '
