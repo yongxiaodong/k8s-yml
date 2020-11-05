@@ -27,19 +27,18 @@ data:
         large_client_header_buffers 4 32k;
         client_max_body_size 1024m;
 
-         log_format json '{ "access_time": "$time_iso8601", '
+
+         log_format json '{ "@timestamp": "$time_iso8601", '
             '"remote_addr": "$remote_addr", '
-            '"http_referrer": "$http_referer", '
-            '"method": "$request", '
-            '"path": "$uri", '
-            '"request_time": $request_time,'
+            '"referer": "$http_referer", '
+            '"request": "$request", '
             '"status": $status, '
-            '"body_bytes_sent":$body_bytes_sent, '
-            '"http_user_agent": "$http_user_agent", '
-            '"x-forward-for": "$http_x_forwarded_for", '
-            '"upstream_addr": "$upstream_addr",'
-            '"upstream_response_time": "$upstream_response_time", '
-            '"request_id": "$http_x_request_id" }';
+            '"bytes":$body_bytes_sent, '
+            '"agent": "$http_user_agent", '
+            '"x_forwarded": "$http_x_forwarded_for", '
+            '"upstr_addr": "$upstream_addr",'
+            '"request_id": "$http_x_request_id",'
+            '"ups_resp_time": "$upstream_response_time" }';
 
 
         access_log  /var/log/nginx/access.log  json;
