@@ -29,15 +29,17 @@ data:
 
          log_format json '{ "@timestamp": "$time_iso8601", '
             '"remote_addr": "$remote_addr", '
-            '"referer": "$http_referer", '
-            '"request": "$request", '
+            '"http_referrer": "$http_referer", '
+            '"method": "$request", '
+            '"path": "$uri", '
+            '"request_time": $request_time,'
             '"status": $status, '
-            '"bytes":$body_bytes_sent, '
-            '"agent": "$http_user_agent", '
-            '"x_forwarded": "$http_x_forwarded_for", '
-            '"upstr_addr": "$upstream_addr",'
-            '"upstr_host": "$upstream_http_host",'
-            '"ups_resp_time": "$upstream_response_time" }';
+            '"body_bytes_sent":$body_bytes_sent, '
+            '"http_user_agent": "$http_user_agent", '
+            '"x-forward-for": "$http_x_forwarded_for", '
+            '"upstream_addr": "$upstream_addr",'
+            '"upstream_response_time": "$upstream_response_time" ,'
+            '"request_id": "$request_id" }';
 
         access_log  /var/log/nginx/access.log  json;
 
