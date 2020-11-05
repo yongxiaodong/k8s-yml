@@ -67,6 +67,7 @@ spec:
 				sh """
 				    /bin/cp -fR ../${JOB_NAME}/* ./
 				    /bin/cp -fR ../${JOB_NAME}/.dockerignore ./ || exit 0
+				    /bin/cp -fR ../configmap/nginx/nginx.yml ./
 				   """
 			}
 			}
@@ -123,6 +124,10 @@ spec:
                    env.fqdn_domain = "${fqdn_domain}"
                    sh """
                        /bin/cp -f deploy.yml deploy_old.yml
+                       # nginx配置文件替换创建的namespace名称和全局namespace名称
+                       sed -i "0,/name:.*/ s//name: ${namespace}/" nginx.yml
+                       sed -i "s/namespace:.*/namespace: ${namespace}/g" nginx.yml
+
                        # 替换创建的namespace名称
                        sed -i "0,/name:.*/ s//name: ${namespace}/" deploy.yml
                        # 替换全局namespace名称
