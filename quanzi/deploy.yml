@@ -27,8 +27,6 @@ data:
         large_client_header_buffers 4 32k;
         client_max_body_size 1024m;
 
-
-
          log_format json '{ "access_time": "$time_iso8601", '
             '"remote_addr": "$remote_addr", '
             '"http_referrer": "$http_referer", '
