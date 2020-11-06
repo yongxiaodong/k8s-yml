@@ -136,8 +136,13 @@ spec:
                        sed -i "s#image: .*#image: ${docker_image_fqdn}#g" deploy.yml
 
                        # 替换.为-
-                       sed -i '0,/name: .*/ s/\\./-/g' deploy.yml
+                       sed -i '0,/name: .*/ s/\\./-/g' nginx.yml
+                       sed -i '/namespace: .*/ s/\\./-/g' nginx.yml
                        sed -i '/namespace: .*/ s/\\./-/g' deploy.yml
+                       # 替换_为-
+                       sed -i '0,/name: .*/ s/_/-/g' nginx.yml
+                       sed -i '/namespace: .*/ s/_/-/g' nginx.yml
+                       sed -i '/namespace: .*/ s/_/-/g' deploy.yml
                    """
 
 				}
