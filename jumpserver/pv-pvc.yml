@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jumpserver
+spec:
+  capacity:
+    storage: 512Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs-1
+  nfs:
+    path: /jumpserver
+    server: 964424b51b-slc75.cn-zhangjiakou.nas.aliyuncs.com
+  mountOptions:
+  - nfsvers=4.0
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jumpserver
+  namespace: jumpserver
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 512Gi
+  storageClassName: nfs-1
+#  volumeName: logs

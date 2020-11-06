@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jumpserver
+  namespace: jumpserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+     name: jumpserver
+  template:
+    metadata:
+      labels:
+        name: jumpserver
+    spec:
+      containers:
+      - name: jumpserver
+        image: jumpserver/jms_all:v2.4.3
+        resources:
+          requests:
+            cpu: "10m"
+            memory: "512Mi"
+          limits:
+            memory: "6144Mi"
+        readinessProbe:
+          tcpSocket:
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 3
+        livenessProbe:
+          tcpSocket:
+            port: 80
+          initialDelaySeconds: 180
+          periodSeconds: 3
+        env:
+          - name: SECRET_KEY
+            value: "eP5k1sWTpIsgep46dPKxvHwGfBH1As1sELoVdD2QTxI5hJ9gGw"
+          - name: BOOTSTRAP_TOKEN
+            value: "gluW7z4cTvbhRayf"
+          - name: DB_HOST
+            value: "rm-8vb752cx8t7691u7d.mysql.zhangbei.rds.aliyuncs.com"
+          - name: DB_PORT
+            value: "3306"
+          - name: DB_USER
+            value: "jumpserver"
+          - name: DB_PASSWORD
+            value: "okvoice_okvoice"
+          - name: DB_NAME
+            value: "jumpserver"
+          - name: REDIS_HOST
+            value: "r-8vb9uv4jig8cv4i0d6.redis.zhangbei.rds.aliyuncs.com"
+          - name: REDIS_PORT
+            value: "6379"
+          - name: REDIS_PASSWORD
+            value: "7gxjTi3n58PNkVus"
+        volumeMounts:
+        - mountPath: /opt/jumpserver/data
+          name: jumpserver
+      volumes:
+      - name: jumpserver
+        persistentVolumeClaim:
+          claimName: jumpserver
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jumpserver
+  namespace: jumpserver
+spec:
+  selector:
+    name: jumpserver
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: jumpserver
+  namespace: jumpserver
+spec:
+  rules:
+    - host: jumpserver.okyuyin.com
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: jumpserver
+            servicePort: 80
