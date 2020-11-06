@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: quanzi
+  name: allstop
 ---
 
 apiVersion: v1
@@ -57,7 +57,7 @@ data:
 kind: ConfigMap
 metadata:
   name: nginx-base-conf
-  namespace: quanzi
+  namespace: allstop
 ---
 
 apiVersion: v1
@@ -69,15 +69,12 @@ data:
         server_name  localhost;
 
         location / {
-            add_header 'Access-Control-Allow-Origin' '*';
-            add_header 'Access-Control-Allow-Headers' '*';
-            add_header 'Access-Control-Allow-Methods' '*';
-            root   /usr/share/nginx/html;
-            index  index.html index.htm;
+            default_type application/json;
+            return 444 '{"msg": "服务器维护中,稍后恢复", "code": 444}';
         }
     }
 
 kind: ConfigMap
 metadata:
   name: nginx-confd-dir
-  namespace: quanzi
+  namespace: allstop
