@@ -1,13 +1,13 @@
-#apiVersion: v1
-#kind: Namespace
-#metadata:
-#  name: okvoice-task
-#---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: master-okvoice-task
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: okvoice-task
-  namespace: okvoice-task
+  namespace: master-okvoice-task
 spec:
   replicas: 1
   selector:
@@ -38,20 +38,20 @@ spec:
             port: 6666
           initialDelaySeconds: 180
           periodSeconds: 3
-        volumeMounts:
-        - mountPath: /logs
-          name: logs
-      volumes:
-      - name: logs
-        persistentVolumeClaim:
-          claimName: okvoice-task-logs-1
+#        volumeMounts:
+#        - mountPath: /logs
+#          name: logs
+#      volumes:
+#      - name: logs
+#        persistentVolumeClaim:
+#          claimName: okvoice-task-logs-1
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: okvoice-task
-  namespace: okvoice-task
+  namespace: master-okvoice-task
 spec:
   selector:
     name: okvoice-task
@@ -65,10 +65,10 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: okvoice-task
-  namespace: okvoice-task
+  namespace: master-okvoice-task
 spec:
   rules:
-    - host: prd-k8s-okvoice-task.okyuyin.com
+    - host: master-okvoice-task.prod.okyuyin.com
       http:
         paths:
         - path: /
