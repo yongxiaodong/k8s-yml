@@ -75,3 +75,11 @@ spec:
           backend:
             serviceName: okvoice-task
             servicePort: 80
+    - host: task.okyuyin.com
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: okvoice-task
+            servicePort: 80
+
