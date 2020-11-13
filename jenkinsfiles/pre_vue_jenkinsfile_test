@@ -163,7 +163,6 @@ spec:
 				kubernetesDeploy configs: 'nginx.yml', kubeconfigId: "${${env.target_environment_kubeid}}"
 				kubernetesDeploy configs: 'deploy.yml', kubeconfigId: "${${env.target_environment_kubeid}}"
 			}
-			}
 		}
 		stage('生成URL访问地址') {
 			steps {
