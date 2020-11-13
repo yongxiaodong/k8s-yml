@@ -121,9 +121,9 @@ spec:
 				    withCredentials([usernamePassword(credentialsId: "${harbor_auth_id}", passwordVariable: 'harbor_password', usernameVariable: 'harbor_username')]) {
                         sh """
                         docker build -t  ${env.docker_image_fqdn} -f prd_Dockerfile  .
-                        # docker login -u ${harbor_username} -p ${harbor_password} ${env.docker_registry}
-                        # docker push ${env.docker_image_fqdn}
-                        # docker rmi ${env.docker_image_fqdn}
+                        docker login -u ${harbor_username} -p ${harbor_password} ${env.docker_registry}
+                        docker push ${env.docker_image_fqdn}
+                        docker rmi ${env.docker_image_fqdn}
                         """
                     }
 			}
