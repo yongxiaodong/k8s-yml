@@ -80,7 +80,7 @@ spec:
 		stage('拉取代码') {
 			steps {
 			dir('./project') {
-				checkout([$class: 'GitSCM', branches: [[name: "${env.project_branch_name}"]], extensions: [[$class: 'CheckoutOption', timeout: 20], [$class: 'CloneOption', depth: 1]], userRemoteConfigs: [[credentialsId: "${git_token_id}", url: "${env.project_git_url}"]]])
+				checkout([$class: 'GitSCM', branches: [[name: "${env.project_branch_name}"]], extensions: [[$class: 'CheckoutOption', timeout: 20], [$class: 'CloneOption', depth: 1]], userRemoteConfigs: [[credentialsId: "${git_token_id}", url: "${project_git_url}"]]])
 				sh """
 				    /bin/cp -fR ../${env.target_environment}/${env.project_name}/* ./
 				    /bin/cp -fR ../${env.target_environment}/${env.project_name}/.dockerignore ./ || exit 0
