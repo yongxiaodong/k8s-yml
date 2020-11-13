@@ -71,7 +71,7 @@ spec:
                    env.pre_k8s_kubeconfigid = '1e486a1c-7a15-425e-adf2-e114d233ded5'
                    env.prod_k8s_kubeconfigid = 'e94c584f-510a-4b20-be41-eda4a9b35770'
 
-                   env.target_environment_kubeid = 'env.' + "${env.target_environment}" + '_' + '_k8s_kubeconfigid'
+                   env.target_environment_kubeid = 'env.' + "${env.target_environment}" + '_k8s_kubeconfigid'
                    echo "${env.target_environment_kubeid}"
                    echo "${${env.target_environment_kubeid}}"
 				}
