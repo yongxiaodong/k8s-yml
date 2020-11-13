@@ -72,6 +72,8 @@ spec:
                    env.prod_k8s_kubeconfigid = 'e94c584f-510a-4b20-be41-eda4a9b35770'
 
                    env.target_environment_kubeid = 'env.' + "${env.target_environment}" + '_' + '_k8s_kubeconfigid'
+                   echo "${env.target_environment_kubeid}"
+                   echo "${${env.target_environment_kubeid}}"
 				}
             }
         }
@@ -127,7 +129,7 @@ spec:
 			}
 			}
 		}
-		stage('部署应用') {
+		stage('部署到K8S') {
 			steps {
 				dir('./project') {
                    sh """
