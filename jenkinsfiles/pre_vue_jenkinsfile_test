@@ -57,12 +57,12 @@ spec:
                    env.project_name = "${JOB_NAME}".tokenize('=')[0]
                    env.project_branch_name = "${JOB_NAME}".tokenize('=')[-1]
                    env.namespace = "${env.project_branch_name}" + '-' + "${env.project_name}"
-                   env.fqdn_domain = "${env.namespace}" + "${primary_domain}"
 
                    env.docker_registry = '172.26.112.47'
                    env.docker_registry_item = 'app'
                    env.image_name = "${env.project_name}"
                    env.primary_domain = '.pre.okyuyin.com'
+                   env.fqdn_domain = "${env.namespace}" + "${env.primary_domain}"
                    env.docker_image_fqdn = "${env.docker_registry}/${env.docker_registry_item}/${env.image_name}-${env.project_branch_name}:${BUILD_ID}"
 
                    env.git_token_id = '09267d83-3027-4ac5-a940-e0e61757e48a'
@@ -75,7 +75,6 @@ spec:
 				}
             }
         }
-
 
 		stage('拉取代码') {
 			steps {
