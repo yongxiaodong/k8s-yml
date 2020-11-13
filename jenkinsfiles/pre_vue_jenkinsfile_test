@@ -71,9 +71,8 @@ spec:
                    env.pre_k8s_kubeconfigid = '1e486a1c-7a15-425e-adf2-e114d233ded5'
                    env.prod_k8s_kubeconfigid = 'e94c584f-510a-4b20-be41-eda4a9b35770'
 
-                   env.target_environment_kubeid = 'env.' + "${env.target_environment}" + '_k8s_kubeconfigid'
-                   echo "${env.target_environment_kubeid}"
-                   echo "${${env.target_environment_kubeid}}"
+
+
 				}
             }
         }
@@ -161,8 +160,8 @@ spec:
                        sed -i '/namespace: .*/ s/_/-/g' nginx.yml
                        sed -i '/namespace: .*/ s/_/-/g' deploy.yml
                    """}
-				kubernetesDeploy configs: 'nginx.yml', kubeconfigId: "${${env.target_environment_kubeid}}"
-				kubernetesDeploy configs: 'deploy.yml', kubeconfigId: "${${env.target_environment_kubeid}}"
+				kubernetesDeploy configs: 'nginx.yml', kubeconfigId: "${env.pre_k8s_kubeconfigid}"
+				kubernetesDeploy configs: 'deploy.yml', kubeconfigId: "${env.pre_k8s_kubeconfigid}"
 			}
 		}
 		stage('生成URL访问地址') {
