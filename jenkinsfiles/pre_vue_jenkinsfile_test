@@ -83,7 +83,7 @@ spec:
 				sh """
 				    /bin/cp -fR ../${env.target_environment}/${env.project_name}/* ./
 				    /bin/cp -fR ../${env.target_environment}/${env.project_name}/.dockerignore ./ || exit 0
-				    /bin/cp -fR ../${env.target_environment}/configmap/nginx/nginx.yml ./
+				    /bin/cp -fR ../configmap/nginx/nginx.yml ./
 				   """
 			}
 			}
