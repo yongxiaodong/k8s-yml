@@ -44,8 +44,7 @@ spec:
    environment {
    // 接收参数-必须: project_branch_name & skip & replicas_count & build_command
    // k8s_kubeconfig_auth & harbor_auth_id
-
-
+        author = 'yongxiaodong'
    }
     options {
       buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '15', numToKeepStr: '15')
