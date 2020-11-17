@@ -156,9 +156,10 @@ spec:
                        sed -i '0,/name: .*/ s/_/-/g' nginx.yml
                        sed -i '/namespace: .*/ s/_/-/g' nginx.yml
                        sed -i '/namespace: .*/ s/_/-/g' deploy.yml
-                   """}
+                   """
 				kubernetesDeploy configs: 'nginx.yml', kubeconfigId: "${env.pre_k8s_kubeconfigid}"
 				kubernetesDeploy configs: 'deploy.yml', kubeconfigId: "${env.pre_k8s_kubeconfigid}"
+				}
 			}
 		}
 		stage('生成URL访问地址') {
