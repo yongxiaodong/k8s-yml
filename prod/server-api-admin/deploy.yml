@@ -59,7 +59,7 @@ metadata:
   namespace: server-api-admin
 spec:
   rules:
-    - host: one.okyuyin.com
+    - host: wan.okyuyin.com
       http:
         paths:
         - path: /
