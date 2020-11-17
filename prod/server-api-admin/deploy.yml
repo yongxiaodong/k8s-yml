@@ -31,12 +31,12 @@ spec:
         readinessProbe:
           tcpSocket:
             port: 8001
-          initialDelaySeconds: 5
+          initialDelaySeconds: 30
           periodSeconds: 3
         livenessProbe:
           tcpSocket:
             port: 8001
-          initialDelaySeconds: 30
+          initialDelaySeconds: 180
           periodSeconds: 3
 ---
 apiVersion: v1
