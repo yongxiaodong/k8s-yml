@@ -62,14 +62,14 @@ metadata:
   namespace: master-okvoice-task
 spec:
   rules:
-    - host: master-okvoice-task.prod.okyuyin.com
+    - host: master-okvoice-task.local.okyuyin.com
       http:
         paths:
         - path: /
           backend:
             serviceName: okvoice-task
             servicePort: 80
-    - host: task.okyuyin.com
+    - host: task.local.okyuyin.com
       http:
         paths:
         - path: /
