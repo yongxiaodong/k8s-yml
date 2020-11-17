@@ -44,8 +44,7 @@ spec:
    environment {
    // 接收参数-必须: project_branch_name & skip & replicas_count & build_command
    // k8s_kubeconfig_auth & harbor_auth_id
-
-
+        author = 'yongxiaodong'
    }
     options {
       buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '15', numToKeepStr: '15')
@@ -58,12 +57,12 @@ spec:
                    env.project_name = "${JOB_NAME}".tokenize('=')[0]
                    env.project_branch_name = "${JOB_NAME}".tokenize('=')[-1]
                    env.namespace = "${env.project_branch_name}" + '-' + "${env.project_name}"
-                   env.fqdn_domain = "${env.namespace}" + "${primary_domain}"
 
                    env.docker_registry = '172.26.112.47'
                    env.docker_registry_item = 'app'
                    env.image_name = "${env.project_name}"
                    env.primary_domain = '.pre.okyuyin.com'
+                   env.fqdn_domain = "${env.namespace}" + "${env.primary_domain}"
                    env.docker_image_fqdn = "${env.docker_registry}/${env.docker_registry_item}/${env.image_name}-${env.project_branch_name}:${BUILD_ID}"
 
                    env.git_token_id = '09267d83-3027-4ac5-a940-e0e61757e48a'
@@ -72,20 +71,17 @@ spec:
                    env.pre_k8s_kubeconfigid = '1e486a1c-7a15-425e-adf2-e114d233ded5'
                    env.prod_k8s_kubeconfigid = 'e94c584f-510a-4b20-be41-eda4a9b35770'
 
-                   env.target_environment_kubeid = 'env.' + "${env.target_environment}" + '_' + '_k8s_kubeconfigid'
 				}
             }
         }
-
-
+    stages {
 		stage('拉取代码') {
 			steps {
 			dir('./project') {
-				checkout([$class: 'GitSCM', branches: [[name: "${env.project_branch_name}"]], extensions: [[$class: 'CheckoutOption', timeout: 20], [$class: 'CloneOption', depth: 1]], userRemoteConfigs: [[credentialsId: "${git_token_id}", url: "${env.project_git_url}"]]])
+				checkout([$class: 'GitSCM', branches: [[name: "${env.project_branch_name}"]], extensions: [[$class: 'CheckoutOption', timeout: 20], [$class: 'CloneOption', depth: 1]], userRemoteConfigs: [[credentialsId: "${git_token_id}", url: "${project_git_url}"]]])
 				sh """
 				    /bin/cp -fR ../${env.target_environment}/${env.project_name}/* ./
 				    /bin/cp -fR ../${env.target_environment}/${env.project_name}/.dockerignore ./ || exit 0
-				    /bin/cp -fR ../${env.target_environment}/configmap/nginx/nginx.yml ./
 				   """
 			}
 			}
@@ -99,16 +95,14 @@ spec:
 		}
 	  }
 
-	  stage('npm打包') {
-	        steps {
+	  stage('mvn打包') {
+				steps {
 				script {
 					if ( skip == 'no' ) {
 					dir('./project') {
-					sh """
-                        npm config set registry https://registry.npm.taobao.org
-                        npm install --unsafe-perm
-                        ${build_command}
-					"""
+					sh '''
+						mvn -B -DskipTests clean package
+					'''
 				}
 				}
 				}
@@ -121,23 +115,20 @@ spec:
 				    withCredentials([usernamePassword(credentialsId: "${harbor_auth_id}", passwordVariable: 'harbor_password', usernameVariable: 'harbor_username')]) {
                         sh """
                         docker build -t  ${env.docker_image_fqdn} -f prd_Dockerfile  .
-                        # docker login -u ${harbor_username} -p ${harbor_password} ${env.docker_registry}
-                        # docker push ${env.docker_image_fqdn}
-                        # docker rmi ${env.docker_image_fqdn}
+                        docker login -u ${harbor_username} -p ${harbor_password} ${env.docker_registry}
+                        docker push ${env.docker_image_fqdn}
+                        docker rmi ${env.docker_image_fqdn}
                         """
                     }
 			}
 			}
 		}
-		stage('部署应用') {
+		stage('部署到K8S') {
 			steps {
 				dir('./project') {
                    sh """
                        # 备份上一次的部署文件
                        /bin/cp -f deploy.yml deploy_old.yml
-                       # nginx配置文件替换创建的namespace名称和全局namespace名称,会创建namespace
-                       sed -i "0,/name:.*/ s//name: ${env.namespace}/" nginx.yml
-                       sed -i "s/namespace:.*/namespace: ${env.namespace}/g" nginx.yml
 
                        # 替换deploy部署文件中的的namespace名称
                        sed -i "0,/name:.*/ s//name: ${env.namespace}/" deploy.yml
@@ -150,19 +141,17 @@ spec:
                        # 替换image地址
                        sed -i "s#image: .*#image: ${env.docker_image_fqdn}#g" deploy.yml
 
+
                        # 防止namespaces的名称中出现.和_,k8s不支持创建含有此类特殊字符的名称空间
                        # 替换.为-
-                       sed -i '0,/name: .*/ s/\\./-/g' nginx.yml
-                       sed -i '/namespace: .*/ s/\\./-/g' nginx.yml
+                       sed -i '0,/name: .*/ s/\\./-/g' deploy.yml
                        sed -i '/namespace: .*/ s/\\./-/g' deploy.yml
                        # 替换_为-
-                       sed -i '0,/name: .*/ s/_/-/g' nginx.yml
-                       sed -i '/namespace: .*/ s/_/-/g' nginx.yml
+                       sed -i '0,/name: .*/ s/_/-/g' deploy.yml
                        sed -i '/namespace: .*/ s/_/-/g' deploy.yml
                    """}
-				kubernetesDeploy configs: 'nginx.yml', kubeconfigId: "${${env.target_environment_kubeid}}"
-				kubernetesDeploy configs: 'deploy.yml', kubeconfigId: "${${env.target_environment_kubeid}}"
-			}
+
+				kubernetesDeploy configs: 'deploy.yml', kubeconfigId: "${env.pre_k8s_kubeconfigid}"
 			}
 		}
 		stage('生成URL访问地址') {
