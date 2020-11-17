@@ -49,6 +49,7 @@ spec:
     options {
       buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '15', numToKeepStr: '15')
     }
+
     stages {
         stage('初始化'){
             steps {
@@ -74,7 +75,7 @@ spec:
 				}
             }
         }
-    stages {
+    }
 		stage('拉取代码') {
 			steps {
 			dir('./project') {
