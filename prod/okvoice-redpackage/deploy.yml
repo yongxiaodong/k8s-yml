@@ -1,26 +1,26 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: server-api-admin
+  name: okvoice-redpackage
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: server-api-admin
-  namespace: server-api-admin
+  name: okvoice-redpackage
+  namespace: okvoice-redpackage
 spec:
   replicas: 1
   selector:
     matchLabels:
-     name: server-api-admin
+     name: okvoice-redpackage
   template:
     metadata:
       labels:
-        name: server-api-admin
+        name: okvoice-redpackage
     spec:
       containers:
-      - name: server-api-admin
-        image: 172.26.112.47/server-api-admin/server-api-admin:94
+      - name: okvoice-redpackage
+        image: 172.26.112.47/okvoice-redpackage/okvoice-redpackage:94
         resources:
           requests:
             cpu: "200m"
@@ -42,11 +42,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: server-api-admin
-  namespace: server-api-admin
+  name: okvoice-redpackage
+  namespace: okvoice-redpackage
 spec:
   selector:
-    name: server-api-admin
+    name: okvoice-redpackage
   ports:
   - name: http
     port: 80
@@ -55,8 +55,8 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: server-api-admin
-  namespace: server-api-admin
+  name: okvoice-redpackage
+  namespace: okvoice-redpackage
 spec:
   rules:
     - host: red.prod.okyuyin.com
@@ -64,12 +64,12 @@ spec:
         paths:
         - path: /
           backend:
-            serviceName: server-api-admin
+            serviceName: okvoice-redpackage
             servicePort: 80
     - host: aaa.com
       http:
         paths:
         - path: /
           backend:
-            serviceName: server-api-admin
+            serviceName: okvoice-redpackage
             servicePort: 80
