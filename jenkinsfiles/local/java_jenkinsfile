@@ -75,7 +75,6 @@ spec:
 				}
             }
         }
-    }
 		stage('拉取代码') {
 			steps {
 			dir('./project') {
@@ -162,5 +161,5 @@ spec:
 			}
 		}
 
-
+    }
 }
