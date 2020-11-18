@@ -30,12 +30,12 @@ spec:
             memory: "5128Mi"
         readinessProbe:
           tcpSocket:
-            port: 8001
+            port: 9000
           initialDelaySeconds: 30
           periodSeconds: 3
         livenessProbe:
           tcpSocket:
-            port: 8001
+            port: 9000
           initialDelaySeconds: 180
           periodSeconds: 3
 ---
@@ -50,7 +50,7 @@ spec:
   ports:
   - name: http
     port: 80
-    targetPort: 8001
+    targetPort: 9000
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
@@ -66,7 +66,14 @@ spec:
           backend:
             serviceName: minip
             servicePort: 80
-    - host: xcxdev.okyuyin.com
+    - host: shopxcx.okyuyin.com
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: minip
+            servicePort: 80
+    - host: shopxcx1.okyuyin.com
       http:
         paths:
         - path: /
