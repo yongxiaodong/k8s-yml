@@ -1,0 +1,82 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: order_recovery
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order_recovery
+  namespace: order_recovery
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+     name: order_recovery
+  template:
+    metadata:
+      labels:
+        name: order_recovery
+    spec:
+      containers:
+      - name: order_recovery
+        image: 172.26.112.47/order_recovery/order_recovery:94
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "2048Mi"
+          limits:
+            cpu: "4096m"
+            memory: "5128Mi"
+        readinessProbe:
+          tcpSocket:
+            port: 9000
+          initialDelaySeconds: 30
+          periodSeconds: 3
+        livenessProbe:
+          tcpSocket:
+            port: 9000
+          initialDelaySeconds: 180
+          periodSeconds: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order_recovery
+  namespace: order_recovery
+spec:
+  selector:
+    name: order_recovery
+  ports:
+  - name: http
+    port: 80
+    targetPort: 9000
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: order_recovery
+  namespace: order_recovery
+spec:
+  rules:
+    - host: wan.okyuyin.com
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: order_recovery
+            servicePort: 80
+    - host: shopxcx.okyuyin.com
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: order_recovery
+            servicePort: 80
+    - host: shopxcx1.okyuyin.com
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: order_recovery
+            servicePort: 80
