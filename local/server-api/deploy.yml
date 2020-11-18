@@ -30,13 +30,13 @@ spec:
             memory: "5128Mi"
         readinessProbe:
           httpGet:
-            port: 9090
+            port: 8000
             path: /biz/circleWeb/config/getConfig
           initialDelaySeconds: 60
           periodSeconds: 3
         livenessProbe:
           httpGet:
-            port: 9090
+            port: 8000
             path: /biz/circleWeb/config/getConfig
           initialDelaySeconds: 180
           periodSeconds: 3
@@ -59,7 +59,7 @@ spec:
   ports:
   - name: http
     port: 80
-    targetPort: 9090
+    targetPort: 8000
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
