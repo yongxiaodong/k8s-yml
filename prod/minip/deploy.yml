@@ -1,0 +1,75 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: minip
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minip
+  namespace: minip
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+     name: minip
+  template:
+    metadata:
+      labels:
+        name: minip
+    spec:
+      containers:
+      - name: minip
+        image: 172.26.112.47/minip/minip:94
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "2048Mi"
+          limits:
+            cpu: "4096m"
+            memory: "5128Mi"
+        readinessProbe:
+          tcpSocket:
+            port: 8001
+          initialDelaySeconds: 30
+          periodSeconds: 3
+        livenessProbe:
+          tcpSocket:
+            port: 8001
+          initialDelaySeconds: 180
+          periodSeconds: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minip
+  namespace: minip
+spec:
+  selector:
+    name: minip
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8001
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: minip
+  namespace: minip
+spec:
+  rules:
+    - host: wan.okyuyin.com
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: minip
+            servicePort: 80
+    - host: xcxdev.okyuyin.com
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: minip
+            servicePort: 80
