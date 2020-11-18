@@ -137,6 +137,8 @@ spec:
                        sed -i "s/namespace:.*/namespace: ${env.namespace}/g" deploy.yml
                        # 替换第一个ingress域名,原因:为deploy.yml预留可手动配置其他域名的灵活性
                        sed -i "0,/host:.*/ s//host: ${env.fqdn_domain}/g" deploy.yml
+                       # 替换掉ingress中的_为-
+                       sed -i "0,/_/ s//-/g" deploy.yml
                        # 替换副本数
                        sed -i "s/replicas:.*/replicas: ${replicas_count}/g" deploy.yml
                        # 替换image地址
