@@ -75,4 +75,17 @@ spec:
           backend:
             serviceName: quanzi
             servicePort: 80
-
+    - host: okyuyin.com
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: minip
+            servicePort: 80
+    - host: www.okyuyin.com
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: minip
+            servicePort: 80
