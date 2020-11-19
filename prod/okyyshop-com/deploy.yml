@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: quanzi
-  namespace: quanzi
+  name: okyyshop-com
+  namespace: okyyshop-com
 spec:
   replicas: 1
   selector:
     matchLabels:
-     name: quanzi
+     name: okyyshop-com
   template:
     metadata:
       labels:
-        name: quanzi
+        name: okyyshop-com
     spec:
       containers:
-      - name: quanzi
-        image: 172.26.112.47/quanzi/quanzi:1
+      - name: okyyshop-com
+        image: 172.26.112.47/okyyshop-com/okyyshop-com:1
         resources:
           requests:
             cpu: "100m"
@@ -50,11 +50,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: quanzi
-  namespace: quanzi
+  name: okyyshop-com
+  namespace: okyyshop-com
 spec:
   selector:
-    name: quanzi
+    name: okyyshop-com
   ports:
   - name: http
     port: 80
@@ -64,8 +64,8 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: quanzi
-  namespace: quanzi
+  name: okyyshop-com
+  namespace: okyyshop-com
 spec:
   rules:
     - host:
@@ -73,6 +73,20 @@ spec:
         paths:
         - path: /
           backend:
-            serviceName: quanzi
+            serviceName: okyyshop-com
+            servicePort: 80
+    - host: okyyshop.com
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: okyyshop-com
+            servicePort: 80
+    - host: www.okyyshop.com
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: okyyshop-com
             servicePort: 80
 
