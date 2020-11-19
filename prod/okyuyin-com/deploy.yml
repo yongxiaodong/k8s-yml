@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: okyuyincom
-  namespace: okyuyincom
+  name: okyuyin-com
+  namespace: okyuyin-com
 spec:
   replicas: 1
   selector:
     matchLabels:
-     name: okyuyincom
+     name: okyuyin-com
   template:
     metadata:
       labels:
-        name: okyuyincom
+        name: okyuyin-com
     spec:
       containers:
-      - name: okyuyincom
-        image: 172.26.112.47/okyuyincom/okyuyincom:1
+      - name: okyuyin-com
+        image: 172.26.112.47/okyuyin-com/okyuyin-com:1
         resources:
           requests:
             cpu: "100m"
@@ -50,11 +50,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: okyuyincom
-  namespace: okyuyincom
+  name: okyuyin-com
+  namespace: okyuyin-com
 spec:
   selector:
-    name: okyuyincom
+    name: okyuyin-com
   ports:
   - name: http
     port: 80
@@ -64,8 +64,8 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: okyuyincom
-  namespace: okyuyincom
+  name: okyuyin-com
+  namespace: okyuyin-com
 spec:
   rules:
     - host:
@@ -73,6 +73,19 @@ spec:
         paths:
         - path: /
           backend:
-            serviceName: okyuyincom
+            serviceName: okyuyin-com
             servicePort: 80
-
+    - host: okyyshop.com
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: okyuyin-com
+            servicePort: 80
+    - host: www.okyyshop.com
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: okyuyin-com
+            servicePort: 80
