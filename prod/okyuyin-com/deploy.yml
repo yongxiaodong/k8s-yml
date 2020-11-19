@@ -75,14 +75,14 @@ spec:
           backend:
             serviceName: okyuyin-com
             servicePort: 80
-    - host: okyyshop.com
+    - host: okyuyin.com
       http:
         paths:
         - path: /
           backend:
             serviceName: okyuyin-com
             servicePort: 80
-    - host: www.okyyshop.com
+    - host: www.okyuyin.com
       http:
         paths:
         - path: /
