@@ -40,16 +40,9 @@ spec:
 //  string defaultValue: '1', description: '要运行的副本数量', name: 'replicas_count_template', trim: false
 //  string defaultValue: 'npm run build', description: '要执行的npm打包命令', name: 'build_command_template', trim: false
 // }
-
-   environment {
-   // 接收参数-必须: project_branch_name & skip & replicas_count & build_command
-   // k8s_kubeconfig_auth & harbor_auth_id
-        author = 'yongxiaodong'
-   }
     options {
       buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '15', numToKeepStr: '15')
     }
-
     stages {
         stage('初始化'){
             steps {
@@ -82,6 +75,7 @@ spec:
 				sh """
 				    /bin/cp -fR ../${env.target_environment}/${env.project_name}/* ./
 				    /bin/cp -fR ../${env.target_environment}/${env.project_name}/.dockerignore ./ || exit 0
+				    /bin/cp -fR ../configmap/nginx/nginx.yml ./
 				   """
 			}
 			}
@@ -95,14 +89,19 @@ spec:
 		}
 	  }
 
-	  stage('mvn打包') {
+	  stage('npm打包') {
+					//  when {
+			//     changelog '.*$'
+			//     }
 				steps {
 				script {
 					if ( skip == 'no' ) {
 					dir('./project') {
-					sh '''
-						mvn -B -DskipTests clean package
-					'''
+					sh """
+                        npm config set registry https://registry.npm.taobao.org
+                        npm install --unsafe-perm
+                        ${build_command}
+					"""
 				}
 				}
 				}
@@ -113,23 +112,24 @@ spec:
 			steps {
 				dir('./project') {
 				    withCredentials([usernamePassword(credentialsId: "${harbor_auth_id}", passwordVariable: 'harbor_password', usernameVariable: 'harbor_username')]) {
-				        sh 'sed -i "s/^.*ENV PROFILES_ACTIVE.*$/ENV PROFILES_ACTIVE ${PROFILES_ACTIVE}/g" prd_Dockerfile'
                         sh """
                         docker build -t  ${env.docker_image_fqdn} -f prd_Dockerfile  .
-                        docker login -u ${harbor_username} -p ${harbor_password} ${env.docker_registry}
-                        docker push ${env.docker_image_fqdn}
-                        docker rmi ${env.docker_image_fqdn}
+                        # docker login -u ${harbor_username} -p ${harbor_password} ${env.docker_registry}
+                        # docker push ${env.docker_image_fqdn}
+                        # docker rmi ${env.docker_image_fqdn}
                         """
                     }
 			}
 			}
 		}
-		stage('部署到K8S') {
+		stage('部署应用') {
 			steps {
 				dir('./project') {
                    sh """
-                       # 备份上一次的部署文件
                        /bin/cp -f deploy.yml deploy_old.yml
+                       # nginx配置文件替换创建的namespace名称和全局namespace名称
+                       sed -i "0,/name:.*/ s//name: ${env.namespace}/" nginx.yml
+                       sed -i "s/namespace:.*/namespace: ${env.namespace}/g" nginx.yml
 
                        # 替换deploy部署文件中的的namespace名称
                        sed -i "0,/name:.*/ s//name: ${env.namespace}/" deploy.yml
@@ -142,18 +142,20 @@ spec:
                        # 替换image地址
                        sed -i "s#image: .*#image: ${env.docker_image_fqdn}#g" deploy.yml
 
-
                        # 防止namespaces的名称中出现.和_,k8s不支持创建含有此类特殊字符的名称空间
                        # 替换.为-
-                       sed -i '0,/name: .*/ s/\\./-/g' deploy.yml
+                       sed -i '0,/name: .*/ s/\\./-/g' nginx.yml
+                       sed -i '/namespace: .*/ s/\\./-/g' nginx.yml
                        sed -i '/namespace: .*/ s/\\./-/g' deploy.yml
                        # 替换_为-
-                       sed -i '0,/name: .*/ s/_/-/g' deploy.yml
+                       sed -i '0,/name: .*/ s/_/-/g' nginx.yml
+                       sed -i '/namespace: .*/ s/_/-/g' nginx.yml
                        sed -i '/namespace: .*/ s/_/-/g' deploy.yml
-                   """
 
-				kubernetesDeploy configs: 'deploy.yml', kubeconfigId: "${env.prod_k8s_kubeconfigid}"
-				}
+                   """
+				kubernetesDeploy configs: 'nginx.yml', kubeconfigId: "${prod_k8s_kubeconfigid}"
+				kubernetesDeploy configs: 'deploy.yml', kubeconfigId: "${prod_k8s_kubeconfigid}"
+			}
 			}
 		}
 		stage('生成URL访问地址') {
@@ -162,5 +164,6 @@ spec:
 			}
 		}
 
-    }
+	}
+
 }
