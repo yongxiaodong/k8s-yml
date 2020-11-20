@@ -158,9 +158,11 @@ spec:
 		}
 		stage('生成URL访问地址') {
 			steps {
+			echo """
 			    启动变量： ${PROFILES_ACTIVE}
 			    名称空间： ${env.namespace}
 			    访问地址:  ${env.fqdn_domain}
+			"""
 			}
 		}
 
