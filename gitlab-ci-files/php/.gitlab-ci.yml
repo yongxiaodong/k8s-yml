@@ -1,0 +1,53 @@
+stages:
+  - composer
+  - docker
+  - deploy
+
+
+composer:
+  stage: composer
+  image: registry-vpc.cn-beijing.aliyuncs.com/dataoke-prod/composer-git-ssh:1.10.15
+  script:
+  - composer config -g repo.packagist composer https://mirrors.aliyun.com/composer/
+  - cd basic && composer self-update --2
+  - composer install
+  cache:
+    key:
+      files:
+      - composer.lock
+    paths:
+      - vendor
+  artifacts:
+    name: "vendor"
+    untracked: false
+    expire_in: 5 mins
+    paths:
+      - $CI_PROJECT_DIR/vendor
+  only:
+    - master
+
+docker:
+  stage: docker
+  image: registry-vpc.cn-beijing.aliyuncs.com/dataoke-prod/kaniko-executor:debug
+  script:
+  - mkdir -p /kaniko/.docker
+  - echo "${DOCKER_AUTH_CONFIG}" > /kaniko/.docker/config.json
+  - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile.prod.nginx --destination registry-vpc.cn-beijing.aliyuncs.com/dataoke-prod/`echo ${CI_PROJECT_NAME} |sed 's@_@-@g'`-ngx:${CI_COMMIT_SHORT_SHA} --destination registry-vpc.cn-beijing.aliyuncs.com/dataoke-prod/`echo ${CI_PROJECT_NAME} |sed 's@_@-@g'`-ngx:latest
+  - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile.prod.fpm --destination registry-vpc.cn-beijing.aliyuncs.com/dataoke-prod/`echo ${CI_PROJECT_NAME} |sed 's@_@-@g'`-fpm:${CI_COMMIT_SHORT_SHA} --destination registry-vpc.cn-beijing.aliyuncs.com/dataoke-prod/`echo ${CI_PROJECT_NAME} |sed 's@_@-@g'`-fpm:latest
+  only:
+    - master
+
+deploy:
+  stage: deploy
+  image: registry-vpc.cn-beijing.aliyuncs.com/dataoke-prod/kubectl:1.18.1
+  variables:
+    GIT_STRATEGY: none
+    K8S_NAME_SPACE: default
+  script:
+  - mkdir -p $HOME/.kube
+  - echo "$KUBERNETES_SECRET" >> "$HOME/.kube/config"
+  - kubectl version
+  - kubectl get deployments.apps -n ${K8S_NAME_SPACE}
+  - kubectl -n ${K8S_NAME_SPACE} set image deployment/`echo ${CI_PROJECT_NAME} |sed 's@_@-@g'` nginx=registry-vpc.cn-beijing.aliyuncs.com/dataoke-prod/`echo ${CI_PROJECT_NAME} |sed 's@_@-@g'`-ngx:${CI_COMMIT_SHORT_SHA} php-fpm=registry-vpc.cn-beijing.aliyuncs.com/dataoke-prod/`echo ${CI_PROJECT_NAME} |sed 's@_@-@g'`-fpm:${CI_COMMIT_SHORT_SHA} --record
+  only:
+    - master
