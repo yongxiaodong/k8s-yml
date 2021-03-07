@@ -1,0 +1,25 @@
+apiVersion: v1
+data:
+  application.yaml: |
+    server:
+      port: 9742
+    spring:
+      jackson:
+        time-zone: GMT+8
+        date-format: yyyy-MM-dd HH:mm:ss
+      datasource:
+        primary:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          jdbcUrl: jdbc:mysql://external-prod-mysql.default.svc.cluster.local:3306/dataoke2?useUnicode=true&characterEncoding=UTF-8&useSSL=false&useTimezone=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+          usernam
+
+kind: ConfigMap
+metadata:
+  name: dtk-java-neighbor-live-config
+  namespace: default
+  labels:
+    app.kubernetes.io/name: neighbor-live
+    app.kubernetes.io/runtime: java
+    app.kubernetes.io/tier: backend
+    app.kubernetes.io/environment: prod
+    app.kubernetes.io/managed-by: yong.xd

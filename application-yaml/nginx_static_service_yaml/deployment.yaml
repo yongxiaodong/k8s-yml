@@ -1,0 +1,78 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dtk-static-cms-server-new
+  namespace: default
+  labels:
+    app.kubernetes.io/name: dtk-static-cms-server-new
+    app.kubernetes.io/business: platform
+    app.kubernetes.io/runtime: php
+    app.kubernetes.io/tier: backend
+    app.kubernetes.io/environment: prod
+    app.kubernetes.io/managed-by: yong.xd
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: dtk-static-cms-server-new
+      app.kubernetes.io/business: platform
+      app.kubernetes.io/runtime: php
+      app.kubernetes.io/tier: backend
+      app.kubernetes.io/environment: prod
+      app.kubernetes.io/managed-by: yong.xd
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: dtk-static-cms-server-new
+        app.kubernetes.io/business: platform
+        app.kubernetes.io/runtime: php
+        app.kubernetes.io/tier: backend
+        app.kubernetes.io/environment: prod
+        app.kubernetes.io/managed-by: yong.xd
+      annotations:
+        configmap/checksum: "96ff75e8d9becc33de899087f05053ebec0fb00fffdb6435049bcabea95d6321"
+    spec:
+      imagePullSecrets:
+        - name: aliyun-regcred
+      serviceAccountName: default
+      securityContext:
+      containers:
+        - name: nginx
+          securityContext:
+          image: "regist:latest"
+          volumeMounts:
+          - name: nginx-config
+            mountPath: /etc/nginx/conf.d/
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            periodSeconds: 10
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            periodSeconds: 10
+            timeoutSeconds: 3
+          resources:
+            limits:
+              cpu: 200m
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  # Gracefully shutdown
+                  - /usr/local/openresty/bin/openresty
+                  - -s
+                  - quit
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: dtk-static-cms-server-new-nginx-config
+      - name: runtime
+        emptyDir: {}

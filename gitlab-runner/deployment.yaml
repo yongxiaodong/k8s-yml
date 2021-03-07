@@ -1,0 +1,252 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "9"
+  creationTimestamp: "2020-09-01T01:19:43Z"
+  generation: 9
+  labels:
+    app: gitlab-runner-gitlab-runner
+    chart: gitlab-runner-0.20.0
+    heritage: Helm
+    release: gitlab-runner
+  name: gitlab-runner-gitlab-runner
+  namespace: ops
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: gitlab-runner-gitlab-runner
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        checksum/configmap: 34c7aba8b4355189a63eda205ee3ce22ffc435d99c09a6d76c4c123e29895162
+        checksum/secrets: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+        prometheus.io/port: "9252"
+        prometheus.io/scrape: "true"
+      creationTimestamp: null
+      labels:
+        app: gitlab-runner-gitlab-runner
+        chart: gitlab-runner-0.20.0
+        heritage: Helm
+        release: gitlab-runner
+    spec:
+      containers:
+      - command:
+        - /bin/bash
+        - /scripts/entrypoint
+        env:
+        - name: CI_SERVER_URL
+          value: https://gitlab.haojiequ.com/
+        - name: CLONE_URL
+        - name: RUNNER_REQUEST_CONCURRENCY
+          value: "1"
+        - name: RUNNER_EXECUTOR
+          value: kubernetes
+        - name: REGISTER_LOCKED
+          value: "false"
+        - name: RUNNER_TAG_LIST
+        - name: RUNNER_OUTPUT_LIMIT
+          value: "4096"
+        - name: KUBERNETES_IMAGE
+          value: registry-vpc.cn-beijing.aliyuncs.com/dataoke-prod/debian:stable-slim
+        - name: KUBERNETES_NAMESPACE
+          value: ops
+        - name: KUBERNETES_POLL_TIMEOUT
+          value: "180"
+        - name: KUBERNETES_CPU_LIMIT
+        - name: KUBERNETES_CPU_LIMIT_OVERWRITE_MAX_ALLOWED
+        - name: KUBERNETES_MEMORY_LIMIT
+        - name: KUBERNETES_MEMORY_LIMIT_OVERWRITE_MAX_ALLOWED
+        - name: KUBERNETES_CPU_REQUEST
+          value: 100m
+        - name: KUBERNETES_CPU_REQUEST_OVERWRITE_MAX_ALLOWED
+        - name: KUBERNETES_MEMORY_REQUEST
+          value: 128Mi
+        - name: KUBERNETES_MEMORY_REQUEST_OVERWRITE_MAX_ALLOWED
+        - name: KUBERNETES_SERVICE_ACCOUNT
+        - name: KUBERNETES_SERVICE_CPU_LIMIT
+        - name: KUBERNETES_SERVICE_MEMORY_LIMIT
+        - name: KUBERNETES_SERVICE_CPU_REQUEST
+          value: 100m
+        - name: KUBERNETES_SERVICE_MEMORY_REQUEST
+          value: 128Mi
+        - name: KUBERNETES_HELPER_CPU_LIMIT
+        - name: KUBERNETES_HELPER_MEMORY_LIMIT
+        - name: KUBERNETES_HELPER_CPU_REQUEST
+          value: 100m
+        - name: KUBERNETES_HELPER_MEMORY_REQUEST
+          value: 128Mi
+        - name: KUBERNETES_HELPER_IMAGE
+        - name: KUBERNETES_PULL_POLICY
+        - name: CACHE_TYPE
+          value: s3
+        - name: CACHE_PATH
+        - name: CACHE_SHARED
+          value: "true"
+        - name: CACHE_S3_SERVER_ADDRESS
+          value: dtk-gitlab-ci-cache.oss-cn-beijing-internal.aliyuncs.com
+        - name: CACHE_S3_BUCKET_NAME
+          value: dtk-gitlab-ci-cache
+        - name: CACHE_S3_BUCKET_LOCATION
+          value: cn-beijing
+        image: gitlab/gitlab-runner:alpine-v13.3.0
+        imagePullPolicy: IfNotPresent
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - /entrypoint
+              - unregister
+              - --all-runners
+        livenessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - /scripts/check-live
+          failureThreshold: 3
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: gitlab-runner-gitlab-runner
+        ports:
+        - containerPort: 9252
+          name: metrics
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+            - /usr/bin/pgrep
+            - gitlab.*runner
+          failureThreshold: 3
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /secrets
+          name: runner-secrets
+        - mountPath: /home/gitlab-runner/.gitlab-runner
+          name: etc-gitlab-runner
+        - mountPath: /scripts
+          name: scripts
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+      - name: aliyun-regcred
+      initContainers:
+      - command:
+        - sh
+        - /config/configure
+        env:
+        - name: CI_SERVER_URL
+          value: https://gitlab.haojiequ.com/
+        - name: CLONE_URL
+        - name: RUNNER_REQUEST_CONCURRENCY
+          value: "1"
+        - name: RUNNER_EXECUTOR
+          value: kubernetes
+        - name: REGISTER_LOCKED
+          value: "false"
+        - name: RUNNER_TAG_LIST
+        - name: RUNNER_OUTPUT_LIMIT
+          value: "4096"
+        - name: KUBERNETES_IMAGE
+          value: registry-vpc.cn-beijing.aliyuncs.com/dataoke-prod/debian:stable-slim
+        - name: KUBERNETES_NAMESPACE
+          value: ops
+        - name: KUBERNETES_POLL_TIMEOUT
+          value: "180"
+        - name: KUBERNETES_CPU_LIMIT
+        - name: KUBERNETES_CPU_LIMIT_OVERWRITE_MAX_ALLOWED
+        - name: KUBERNETES_MEMORY_LIMIT
+        - name: KUBERNETES_MEMORY_LIMIT_OVERWRITE_MAX_ALLOWED
+        - name: KUBERNETES_CPU_REQUEST
+          value: 100m
+        - name: KUBERNETES_CPU_REQUEST_OVERWRITE_MAX_ALLOWED
+        - name: KUBERNETES_MEMORY_REQUEST
+          value: 128Mi
+        - name: KUBERNETES_MEMORY_REQUEST_OVERWRITE_MAX_ALLOWED
+        - name: KUBERNETES_SERVICE_ACCOUNT
+        - name: KUBERNETES_SERVICE_CPU_LIMIT
+        - name: KUBERNETES_SERVICE_MEMORY_LIMIT
+        - name: KUBERNETES_SERVICE_CPU_REQUEST
+          value: 100m
+        - name: KUBERNETES_SERVICE_MEMORY_REQUEST
+          value: 128Mi
+        - name: KUBERNETES_HELPER_CPU_LIMIT
+        - name: KUBERNETES_HELPER_MEMORY_LIMIT
+        - name: KUBERNETES_HELPER_CPU_REQUEST
+          value: 100m
+        - name: KUBERNETES_HELPER_MEMORY_REQUEST
+          value: 128Mi
+        - name: KUBERNETES_HELPER_IMAGE
+        - name: KUBERNETES_PULL_POLICY
+        - name: CACHE_TYPE
+          value: s3
+        - name: CACHE_PATH
+        - name: CACHE_SHARED
+          value: "true"
+        - name: CACHE_S3_SERVER_ADDRESS
+          value: dtk-gitlab-ci-cache.oss-cn-beijing-internal.aliyuncs.com
+        - name: CACHE_S3_BUCKET_NAME
+          value: dtk-gitlab-ci-cache
+        - name: CACHE_S3_BUCKET_LOCATION
+          value: cn-beijing
+        image: gitlab/gitlab-runner:alpine-v13.3.0
+        imagePullPolicy: IfNotPresent
+        name: configure
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /secrets
+          name: runner-secrets
+        - mountPath: /config
+          name: scripts
+          readOnly: true
+        - mountPath: /init-secrets
+          name: init-runner-secrets
+          readOnly: true
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        fsGroup: 65533
+        runAsUser: 100
+      serviceAccount: gitlab-runner-gitlab-runner
+      serviceAccountName: gitlab-runner-gitlab-runner
+      terminationGracePeriodSeconds: 3600
+      volumes:
+      - emptyDir:
+          medium: Memory
+        name: runner-secrets
+      - emptyDir:
+          medium: Memory
+        name: etc-gitlab-runner
+      - name: init-runner-secrets
+        projected:
+          defaultMode: 420
+          sources:
+          - secret:
+              name: s3access
+          - secret:
+              items:
+              - key: runner-registration-token
+                path: runner-registration-token
+              - key: runner-token
+                path: runner-token
+              name: gitlab-runner-secret
+      - configMap:
+          defaultMode: 420
+          name: gitlab-runner-gitlab-runner
+        name: scripts

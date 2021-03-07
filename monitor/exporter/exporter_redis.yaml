@@ -1,0 +1,27 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: redis-exporter
+spec:
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '9121'
+        prometheus.io/path: 'metrics'
+      labels:
+        app: redis-exporter
+      name: redis-exporter
+    spec:
+      containers:
+      - name: redis-exporter
+        image: oliver006/redis_exporter 
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: REDIS_ADDR
+          value: redis-server.default:6379
+        - name: REDIS_PASSWORD
+          value: Nonseizure94-superstruct3
+        ports:
+        - containerPort: 9121
+          name: scrape

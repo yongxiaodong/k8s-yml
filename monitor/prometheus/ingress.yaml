@@ -1,0 +1,40 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  generation: 1
+  labels:
+    app.kubernetes.io/managed-by: hang.yao
+    app.kubernetes.io/name: promtheus
+    app.kubernetes.io/version: v2.19.2
+  annotations:
+    nginx.ingress.kubernetes.io/server-snippet: |
+      location ^~ /prometheus/- {
+        deny all;
+      }
+  name: promtheus-ingress
+  namespace: ops
+spec:
+  rules:
+    - host: monitors.haojiequ.com
+      http:
+        paths:
+          - backend:
+              serviceName: prometheus
+              servicePort: 9090
+            path: /prometheus
+          - backend:
+              serviceName: alertmanager
+              servicePort: 9093
+            path: /alertmanager
+          - backend:
+              serviceName: grafana
+              servicePort: 3000
+            path: /grafana
+          - backend:
+              serviceName: dingtalk-webhook-alert
+              servicePort: 8060
+            path: /
+  tls:
+    - hosts:
+        - monitors.haojiequ.com
+      secretName: wildcard.haojiequ.com-tls

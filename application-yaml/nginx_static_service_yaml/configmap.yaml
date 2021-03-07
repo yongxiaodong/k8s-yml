@@ -1,0 +1,33 @@
+apiVersion: v1
+data:
+  default.conf: |
+    server{
+        listen       80 default_server;
+        server_name  _;
+        access_log  /dev/null;
+        error_log /dev/stdout;
+        root /app/build/www;
+
+        location ~ .asset-manifest.json   {
+            default_type apple-app-site-association/json;
+            expires -1;
+        }
+
+        location /health {
+          access_log off;
+          allow 127.0.0.1;
+          deny all;
+          return 200;
+        }
+    }
+kind: ConfigMap
+metadata:
+  name: dtk-static-cms-server-new-nginx-config
+  namespace: default
+  labels:
+    app.kubernetes.io/name: dtk-static-cms-server-new
+    app.kubernetes.io/business: platform
+    app.kubernetes.io/runtime: php
+    app.kubernetes.io/tier: backend
+    app.kubernetes.io/environment: prod
+    app.kubernetes.io/managed-by: yong.xd

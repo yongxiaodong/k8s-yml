@@ -1,9 +1,0 @@
-FROM openjdk:8u181-jre
-MAINTAINER  pascall zhangjie@pascall.xyz
-
-ENV PROFILES_ACTIVE pro
-COPY target/okvoice-shop-0.0.1.jar /app.jar
-RUN echo "Asia/Shanghai" > /etc/timezone
-VOLUME /logs
-EXPOSE 9000
-CMD java -XX:+UseG1GC -jar /app.jar --spring.profiles.active=$PROFILES_ACTIVE

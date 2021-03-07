@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: "Service"
+metadata:
+  name: dingtalk-webhook-alert
+  labels:
+    name: dingtalk-webhook-alert
+  namespace: ops
+spec:
+  ports:
+  - name: dingtalk-webhook-alert
+    protocol: TCP
+    port: 8060
+    targetPort: 8060
+  selector:
+    app: dingtalk-webhook-alert

@@ -1,0 +1,78 @@
+apiVersion: v1
+data:
+  console.php: |
+    pass
+  db.php: |
+    pass
+
+kind: ConfigMap
+metadata:
+  name: dtk-php-cms-server-new-config
+  namespace: default
+  labels:
+    app.kubernetes.io/name: dtk-php-cms-server-new
+    app.kubernetes.io/business: platform
+    app.kubernetes.io/runtime: php
+    app.kubernetes.io/tier: backend
+    app.kubernetes.io/environment: prod
+    app.kubernetes.io/managed-by: yong.xd
+---
+apiVersion: v1
+data:
+  default.conf: |
+    server {
+        listen       80 default_server;
+        server_name  _;
+        index index.php;
+        access_log /dev/stdout;
+        error_log /dev/stderr;
+
+        root /app/;
+        fastcgi_intercept_errors on;
+        fastcgi_hide_header      "x-powered-by";
+
+        location / {
+            index index.php index.html;
+            if ( !-e $request_filename) {
+               rewrite ^/(.*)$ /index.php?$1 last;
+            }
+        }
+
+        location ~ \.php$ {
+            fastcgi_pass   127.0.0.1:9000;
+            fastcgi_index  index.php;
+            fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+            include        fastcgi_params;
+        }
+
+        location ~ ^/(fpm-status)$ {
+            access_log off;
+            include fastcgi_params;
+            fastcgi_pass   127.0.0.1:9000;
+            fastcgi_param SCRIPT_FILENAME $fastcgi_script_name;
+            allow 127.0.0.1;
+            allow 10.0.0.0/8;
+            deny all;
+        }
+
+        location ~ ^/(health)$ {
+            access_log off;
+            include fastcgi_params;
+            fastcgi_pass   127.0.0.1:9000;
+            fastcgi_param SCRIPT_FILENAME $fastcgi_script_name;
+            allow 127.0.0.1;
+            allow 10.0.0.0/8;
+            deny all;
+        }
+    }
+kind: ConfigMap
+metadata:
+  name: dtk-php-cms-server-new-nginx-config
+  namespace: default
+  labels:
+    app.kubernetes.io/name: dtk-php-cms-server-new
+    app.kubernetes.io/business: platform
+    app.kubernetes.io/runtime: php
+    app.kubernetes.io/tier: backend
+    app.kubernetes.io/environment: prod
+    app.kubernetes.io/managed-by: yong.xd

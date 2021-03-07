@@ -1,0 +1,26 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: mongodb-exporter-aliyun
+  namespace: ops
+spec:
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '9216'
+        prometheus.io/path: 'metrics'
+      labels:
+        app: mongodb-exporter-aliyun
+      namespace: ops
+      name: mongodb-exporter-aliyun
+    spec:
+      containers:
+      - name: mongodb-exporter-aliyun
+        image: ssheehy/mongodb-exporter
+        env:
+        - name: MONGODB_URI
+          value: mongodb://dds-2ze29383e7e52d941.mongodb.rds.aliyuncs.com:3717,dds-2ze29383e7e52d942.mongodb.rds.aliyuncs.com:3717/admin?replicaSet=mgset-14704287
+        ports:
+        - containerPort: 9216
+          name: scrape

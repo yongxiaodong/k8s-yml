@@ -1,0 +1,26 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: elaesticsearch-cms-192-168-12-172
+  namespace: ops
+spec:
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '9114'
+        prometheus.io/path: 'metrics'
+      labels:
+        app: elaesticsearch-cms-192-168-12-172
+      namespace: ops
+      name: elaesticsearch-cms-192-168-12-172
+    spec:
+      containers:
+      - name: elaesticsearch-cms-192-168-12-172
+        image: justwatch/elasticsearch_exporter:1.1.0
+        command:
+        - "/bin/elasticsearch_exporter"
+        - "--es.uri=http://192.168.12.172:9200"
+        ports:
+        - containerPort: 9114
+          name: scrape

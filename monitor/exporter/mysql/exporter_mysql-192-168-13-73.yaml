@@ -1,0 +1,31 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: mysqld-exporter-prod-slave-192-168-13-73
+  namespace: ops
+spec:
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '9104'
+        prometheus.io/path: 'metrics'
+      labels:
+        app: mysqld-exporter-prod-slave-192-168-13-73
+      namespace: ops
+      name: mysqld-exporter-prod-slave-192-168-13-73
+    spec:
+      containers:
+      - name: mysqld-exporter-prod-slave-192-168-13-73
+        image: prom/mysqld-exporter
+        args:
+          - --collect.info_schema.innodb_metrics
+          - --collect.info_schema.processlist
+          - --collect.info_schema.innodb_cmp
+          - --collect.info_schema.innodb_cmpmem
+        env:
+        - name: DATA_SOURCE_NAME
+          value: read_user:zJ9hHaQB@9tq@(192.168.13.73:3306)/
+        ports:
+        - containerPort: 9104
+          name: scrape

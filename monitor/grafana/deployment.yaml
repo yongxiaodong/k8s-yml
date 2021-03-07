@@ -1,0 +1,66 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    name: grafana
+  name: grafana
+  namespace: ops
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: grafana
+      annotations: #gAlayvUchDWhDlygh
+        configmap/checksum: "4025221885051d67505f5508a9406b56ef77882299199deeb2c7136a5126a8e3"
+    spec:
+      tolerations:
+      - key: "dedicated"
+        operator: "Equal"
+        value: "monitor"
+        effect: "NoSchedule"
+      nodeSelector:
+        kubernetes.io/hostname: cn-beijing.192.168.23.52
+      containers:
+      - name: grafana
+        image: grafana/grafana:7.0.6
+        args:
+        - "-config=/etc/grafana/grafana.ini"
+        ports:
+        - containerPort: 3000
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /grafana/api/health
+            port: 3000
+            scheme: HTTP
+        livenessProbe:
+          httpGet:
+            path: /grafana/api/health
+            port: 3000
+            scheme: HTTP
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+          runAsNonRoot: true
+          runAsUser: 65534
+        resources:
+          limits:
+            cpu: 100m
+            memory: 256Mi
+        volumeMounts:
+        - mountPath: "/etc/grafana"
+          name: grafana-config
+        - name: data
+          mountPath: /var/lib/grafana
+      volumes:
+      - name: grafana-config
+        configMap:
+          name: grafana-config
+      - name: data
+        hostPath: 
+          path: /var/lib/container/grafana
+          type: DirectoryOrCreate

@@ -1,0 +1,109 @@
+## The GitLab Server URL (with protocol) that want to register the runner against
+## ref: https://docs.gitlab.com/runner/commands/README.html#gitlab-runner-register
+##
+gitlabUrl: https://gitlab.itgod.com/
+
+## The registration token for adding new Runners to the GitLab server. This must
+## be retrieved from your GitLab instance.
+## ref: https://docs.gitlab.com/ee/ci/runners/
+##
+# runnerRegistrationToken: "vUqtnzoamVrF64DCuU5c"
+
+## Unregister all runners before termination
+##
+## Updating the runner's chart version or configuration will cause the runner container
+## to be terminated and created again. This may cause your Gitlab instance to reference
+## non-existant runners. Un-registering the runner before termination mitigates this issue.
+## ref: https://docs.gitlab.com/runner/commands/README.html#gitlab-runner-unregister
+##
+unregisterRunners: true
+
+## Set the certsSecretName in order to pass custom certificates for GitLab Runner to use
+## Provide resource name for a Kubernetes Secret Object in the same namespace,
+## this is used to populate the /etc/gitlab-runner/certs directory
+## ref: https://docs.gitlab.com/runner/configuration/tls-self-signed.html#supported-options-for-self-signed-certificates
+##
+#certsSecretName:
+
+## Configure the maximum number of concurrent jobs
+## ref: https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-global-section
+##
+concurrent: 10
+
+## Defines in seconds how often to check GitLab for a new builds
+## ref: https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-global-section
+##
+checkInterval: 10
+
+## For RBAC support:
+rbac:
+  create: true
+
+  ## Run the gitlab-bastion container with the ability to deploy/manage containers of jobs
+  ## cluster-wide or only within namespace
+  clusterWideAccess: true
+
+  ## If RBAC is disabled in this Helm chart, use the following Kubernetes Service Account name.
+  ##
+  # serviceAccountName: default
+
+## Configuration for the Pods that the runner launches for each new job
+##
+runners:
+  ## Default container image to use for builds when none is specified
+  ##
+  image: registry-vpc.cn-beijing.a:sss
+
+  ## Run all containers with the privileged flag enabled
+  ## This will allow the docker:stable-dind image to run if you need to run Docker
+  ## commands. Please read the docs before turning this on:
+  ## ref: https://docs.gitlab.com/runner/executors/kubernetes.html#using-docker-dind
+  ##
+  privileged: false
+
+  ## Namespace to run Kubernetes jobs in (defaults to 'default')
+  ##
+  namespace: ops
+
+  secret: gitlab-runner-secret
+
+  ## Specify whether the runner should be locked to a specific project: true, false. Defaults to true.
+  ##
+  locked: false
+
+
+  ## Build Container specific configuration
+  ##
+  builds:
+    # cpuLimit: 200m
+    # memoryLimit: 256Mi
+    cpuRequests: 100m
+    memoryRequests: 128Mi
+
+  ## Service Container specific configuration
+  ##
+  services:
+    # cpuLimit: 200m
+    # memoryLimit: 256Mi
+    cpuRequests: 100m
+    memoryRequests: 128Mi
+
+  ## Helper Container specific configuration
+  ##
+  helpers:
+    # cpuLimit: 200m
+    # memoryLimit: 256Mi
+    cpuRequests: 100m
+    memoryRequests: 128Mi
+
+  cache: 
+    cacheType: s3
+    cachePath: ""
+    cacheShared: true
+
+    ## S3 settings
+    s3ServerAddress: dtk-gitlab-ci-cache.oss-cn-beijing-internal.aliyuncs.com
+    s3BucketName: "gitlab-ci"
+    s3BucketLocation: cn-beijing
+    s3CacheInsecure: false
+    secretName: s3acecess

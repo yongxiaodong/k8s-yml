@@ -1,0 +1,81 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    name: prometheus
+  name: prometheus
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: prometheus
+      annotations:
+        configmap/checksum: "4025221885051d67505f5508a9406b56ef77882299199deeb2c7136a5126a8e3"
+    spec:
+      serviceAccountName: prometheus
+      serviceAccount: prometheus
+      nodeSelector:
+        kubernetes.io/hostname: cn-beijing.192.168.23.52
+      tolerations:
+      - key: "dedicated"
+        operator: "Equal"
+        value: "monitor"
+        effect: "NoSchedule"
+      containers:
+      - name: watch
+        image: weaveworks/watch:master-85fdf1d
+        imagePullPolicy: IfNotPresent
+        args: ["-v", "-t", "-p=/etc/prometheus", "curl", "-X", "POST", "--fail", "-o", "-", "-sS", "http://localhost:9090/prometheus/-/reload"]
+        volumeMounts:
+        - mountPath: "/etc/prometheus"
+          name: prometheus-config
+        - mountPath: "/etc/prometheus/rules/"
+          name: prometheus-alert-rules-config
+          
+      - name: prometheus
+        image: prom/prometheus:v2.19.2
+        command:
+        - "/bin/prometheus"
+        args:
+        - "--config.file=/etc/prometheus/prometheus.yml"
+        - "--web.external-url=https://monitors.haojiequ.com/prometheus"
+        - "--storage.tsdb.retention.time=5d"
+        - "--web.enable-lifecycle"
+        ports:
+        - containerPort: 9090
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /prometheus/-/ready
+            port: 9090
+            scheme: HTTP
+        livenessProbe:
+          httpGet:
+            path: /prometheus/-/healthy
+            port: 9090
+            scheme: HTTP
+        resources:
+          limits:
+            cpu: 300m
+            memory: 4096Mi
+        volumeMounts:
+        - mountPath: "/etc/prometheus"
+          name: prometheus-config
+        - mountPath: "/etc/prometheus/rules/"
+          name: prometheus-alert-rules-config
+        - name: data
+          mountPath: /prometheus
+      volumes:
+      - name: prometheus-config
+        configMap:
+          name: prometheus-config
+      - name: prometheus-alert-rules-config
+        configMap:
+          name: prometheus-alert-rules-config
+      - name: data
+        hostPath: 
+          path: /var/lib/container/prometheus
+          type: DirectoryOrCreate

@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dtk-java-neighbor-live
+  annotations:
+    service.beta.kubernetes.io/alibaba-cloud-loadbalancer-force-override-listeners: "true"
+    service.beta.kubernetes.io/alibaba-cloud-loadbalancer-id: lb-2zeqy18
+    service.beta.kubernetes.io/alibaba-cloud-loadbalancer-scheduler: "wrr"
+  namespace: default
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  ports:
+    - port: 16000
+      targetPort: 9742
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: neighbor-live
+    app.kubernetes.io/runtime: java
+    app.kubernetes.io/tier: backend
+    app.kubernetes.io/environment: prod
+    app.kubernetes.io/managed-by: yong.xd

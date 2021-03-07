@@ -1,0 +1,63 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    name: alertmanager
+  name: alertmanager
+  namespace: ops
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: alertmanager
+      annotations:
+        configmap/checksum: "4025221885051d67505f5508a9406b56ef77882299199deeb2c7136a5126a8e3"
+    spec:
+      tolerations:
+      - key: "dedicated"
+        operator: "Equal"
+        value: "monitor"
+        effect: "NoSchedule"
+      nodeSelector:
+        kubernetes.io/hostname: cn-beijing.192.168.23.52
+      containers:
+      - name: alertmanager
+        image: prom/alertmanager:v0.21.0
+        command:
+        - "/bin/alertmanager"
+        args:
+        - "--config.file=/etc/alertmanager/alertmanager.yml"
+        - "--web.external-url=https://monitors.haojiequ.com/alertmanager"
+        ports:
+        - containerPort: 9093
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /alertmanager/-/ready
+            port: 9093
+            scheme: HTTP
+        livenessProbe:
+          httpGet:
+            path: /alertmanager/-/healthy
+            port: 9093
+            scheme: HTTP
+        resources:
+          limits:
+            cpu: 50m
+            memory: 256Mi
+        volumeMounts:
+        - mountPath: "/etc/alertmanager"
+          name: alertmanager-config
+        - name: data
+          mountPath: /alertmanager
+      volumes:
+      - name: alertmanager-config
+        configMap:
+          name: alertmanager-config
+      - name: data
+        hostPath: 
+          path: /var/lib/container/alertmanager
+          type: DirectoryOrCreate

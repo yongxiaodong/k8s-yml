@@ -1,0 +1,49 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    name: dingtalk-webhook-alert
+  name: dingtalk-webhook-alert
+  namespace: ops
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: dingtalk-webhook-alert
+      annotations:
+        configmap/checksum: "4025221885051d67505f5508a9406b56ef77882299199deeb2c7136a5126a8e3"
+    spec:
+      containers:
+      - name: dingtalk-webhook-alert
+        image: timonwong/prometheus-webhook-dingtalk
+        args:
+        - "--config.file=/etc/dingtalk-webhook-alert/config.yaml"
+        - "--web.enable-ui"
+        - "--web.enable-lifecycle"
+        ports:
+        - containerPort: 8060
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /-/ready
+            port: 8060
+            scheme: HTTP
+        livenessProbe:
+          httpGet:
+            path: /-/healthy
+            port: 8060
+            scheme: HTTP
+        resources:
+          limits:
+            cpu: 50m
+            memory: 256Mi
+        volumeMounts:
+        - mountPath: "/etc/dingtalk-webhook-alert"
+          name: dingtalk-webhook-alert-config
+      volumes:
+      - name: dingtalk-webhook-alert-config
+        configMap:
+          name: dingtalk-webhook-alert-config

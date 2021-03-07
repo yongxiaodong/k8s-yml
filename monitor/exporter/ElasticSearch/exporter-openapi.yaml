@@ -1,0 +1,35 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: elaesticsearch-openapi-192-168-12-4
+  name: elaesticsearch-openapi-192-168-12-4
+  namespace: ops
+spec:
+  selector:
+    matchLabels:
+      app: elaesticsearch-openapi-192-168-12-4
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: metrics
+        prometheus.io/port: "9114"
+        prometheus.io/scrape: "true"
+      labels:
+        app: elaesticsearch-openapi-192-168-12-4
+      name: elaesticsearch-openapi-192-168-12-4
+      namespace: ops
+    spec:
+      containers:
+      - command:
+        - /bin/elasticsearch_exporter
+        - --es.uri=http://192.168.12.4:9200
+        - --es.all
+        image: justwatch/elasticsearch_exporter:1.1.0
+        imagePullPolicy: IfNotPresent
+        name: elaesticsearch-openapi-192-168-12-4
+        ports:
+        - containerPort: 9114
+          name: scrape
+          protocol: TCP
+        resources: {}

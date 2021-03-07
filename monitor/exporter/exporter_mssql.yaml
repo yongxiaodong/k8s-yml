@@ -1,0 +1,36 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: mssql-exporter
+  namespace: ops
+spec:
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '4000'
+        prometheus.io/path: 'metrics'
+      labels:
+        app: mssql-exporter
+      name: mssql-exporter
+    spec:
+      containers:
+      - name: mssql-exporter
+        image: registry-vpc.cn-chengdu.aliyuncs.com/linggan/prometheus-mssql-exporter:67336b2
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: SERVER
+          value: prod-mssql-server.default
+        - name: PORT
+          value: "4433"
+        - name: ENCRYPT
+          value: "false"
+        - name: USERNAME
+          value: "exporter"
+        - name: PASSWORD
+          value: 9UVKUaCXDBrkbovnx
+        - name: DEBUG
+          value: app
+        ports:
+        - containerPort: 4000
+          name: scrape

@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-legacy-alert-rules-config
+  namespace: ops
+data:
+  legacy.rules: |
+    groups:
+    - name: dtk_spider_errorlog
+      rules:
+      - alert: dtk_spider_errorlog
+        expr: sum(dtk_spider) > 1
+        for: 2m
+        labels:
+          severity: page
+        annotations:
+          description: 'dtk_spider有异常日志.'
+          #summary: 'Ecs {{ $labels.instance }} down'
+    groups:
+    - name: Ecs主机存活告警
+      rules:
+      - alert: Ecs主机存活告警
+        expr: up == 0
+        for: 2m
+        labels:
+          severity: page
+        annotations:
+          description: '{{ $labels.instance }} 主机异常'
+    - name: 一般负载报警
+      rules:
+      - alert: 一般负载报警
+        expr: sum by (instance) (node_load1{job="ECS"}) > 5
+        for: 5m
+        labels:
+          severity: page
+        annotations:
+          description: '{{ $labels.instance }} 负载已超过5'
+    - name: 磁盘可用空间报警
+      rules:
+      - alert: 磁盘可用空间报警
+        expr: (1-(node_filesystem_size_bytes{job="ECS",fstype=~"ext4"} - node_filesystem_free_bytes{job="ECS",fstype=~"ext4"}) / node_filesystem_size_bytes{}) * 100 < 15
+        for: 1m
+        labels:
+          severity: page
+        annotations:
+          description: '{{ $labels.instance }} 磁盘可用空间小于15%'
+    groups:
+    - name: 持续高负载报警
+      rules:
+      - alert: 持续高负载报警
+        expr: sum by (instance) (node_load1{job="gfzECS"}) > 10
+        for: 5m
+        labels:
+          severity: page
+        annotations:
+          description: '{{ $labels.instance }} 负载已超过10'
+    - name: 高负载主机磁盘可用空间报警
+      rules:
+      - alert: 高负载机器磁盘可用空间报警
+        expr: (1-(node_filesystem_size_bytes{job="gfzECS",fstype=~"ext4"} - node_filesystem_free_bytes{job="gfzECS",fstype=~"ext4"}) / node_filesystem_size_bytes{}) * 100 < 15
+        for: 1m
+        labels:
+          severity: page
+        annotations:
+          description: '{{ $labels.instance }} 磁盘可用空间小于15%'

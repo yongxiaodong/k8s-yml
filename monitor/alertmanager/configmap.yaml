@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-config
+  namespace: ops
+data:
+  alertmanager.yml: |
+    global:
+      resolve_timeout: 5m
+    
+    route:
+      group_by: ['alertname']
+      group_wait: 10s
+      group_interval: 10s
+      repeat_interval: 1h
+      receiver: 'dingtalk'
+    receivers:
+    - name: 'dingtalk'
+      webhook_configs:
+      - url: 'http://dingtalk-webhook-alert.ops:8060/dingtalk/webhook-dingtalk/send'
+    # inhibit_rules:
+    #   - source_match:
+    #       severity: 'critical'
+    #     target_match:
+    #       severity: 'warning'
+    #     equal: ['alertname', 'dev', 'instance']
