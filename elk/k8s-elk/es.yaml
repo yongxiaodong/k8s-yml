@@ -1,0 +1,126 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: elasticsearch
+  namespace: logging
+  labels:
+    app: elasticsearch
+spec:
+  type: NodePort
+  selector:
+    app: elasticsearch
+#  clusterIP: None
+  ports:
+    - port: 9200
+      name: rest
+      nodePort: 32767
+    - port: 9300
+      name: inter-node
+      
+      
+---
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: es
+  namespace: logging
+spec:
+  serviceName: elasticsearch
+  replicas: 3
+  selector:
+    matchLabels:
+      app: elasticsearch
+  template:
+    metadata:
+      labels: 
+        app: elasticsearch
+    spec:
+      nodeSelector:
+        es: es
+      initContainers:
+      - name: increase-vm-max-map
+        image: busybox
+        command: ["sysctl", "-w", "vm.max_map_count=262144"]
+        securityContext:
+          privileged: true
+      - name: increase-fd-ulimit
+        image: busybox
+        command: ["sh", "-c", "ulimit -n 65536;mkdir -p /esdata;chmod 777 /esdata"]
+        securityContext:
+          privileged: true
+      containers:
+      - name: elasticsearch
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.6.2
+        ports:
+        - name: rest
+          containerPort: 9200
+        - name: inter
+          containerPort: 9300
+        resources:
+          limits:
+            cpu: 8192m
+          requests:
+            cpu: 7000m
+        volumeMounts:
+        - name: data
+          mountPath: /usr/share/elasticsearch/data
+        env:
+        - name: cluster.name
+          value: k8s-logs
+        - name: node.name
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: cluster.initial_master_nodes
+          value: "es-1,es-2,es-3"
+        - name: discovery.zen.minimum_master_nodes
+          value: "3"
+        - name: discovery.seed_hosts
+          value: "elasticsearch"
+        - name: ES_JAVA_OPTS
+          value: "-Xms8096m -Xmx8096m"
+        - name: network.host
+          value: "0.0.0.0"
+#        - name: index.refresh_interval
+#          value: "1"
+#        - name: path.data
+#          value: "/var/lib/container/esdata"
+      tolerations:
+      - key: "es"
+        operator: "Exists"
+        effect: "NoSchedule"
+      volumes:
+      - name: data
+        hostPath:
+          path: "/esdata"
+#  volumeClaimTemplates:
+#  - metadata:
+#      name: data
+#      labels:
+#        app: elasticsearch
+#    spec:
+#      accessModes: [ "ReadWriteOnce" ]
+#      storageClassName: nfs-1
+#      resources:
+#        requests:
+#          storage: 1024Gi
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: es
+  namespace: logging
+#  annotations:
+#    nginx.ingress.kubernetes.io/whitelist-source-range: '172.26.0.0/16'
+spec:
+  rules:
+    - host: k8ses.haojiequ.com
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: elasticsearch
+            servicePort: 9200
+ 
