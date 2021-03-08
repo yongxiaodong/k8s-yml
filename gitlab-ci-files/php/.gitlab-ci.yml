@@ -2,7 +2,7 @@ stages:
   - composer
   - docker
   - deploy
-
+  - notify
 
 composer:
   stage: composer
@@ -51,3 +51,23 @@ deploy:
   - kubectl -n ${K8S_NAME_SPACE} set image deployment/`echo ${CI_PROJECT_NAME} |sed 's@_@-@g'` nginx=registry-vpc.cn-beijing.aliyuncs.com/dataoke-prod/`echo ${CI_PROJECT_NAME} |sed 's@_@-@g'`-ngx:${CI_COMMIT_SHORT_SHA} php-fpm=registry-vpc.cn-beijing.aliyuncs.com/dataoke-prod/`echo ${CI_PROJECT_NAME} |sed 's@_@-@g'`-fpm:${CI_COMMIT_SHORT_SHA} --record
   only:
     - master
+notifyFailWeChat:
+  stage: notify
+  image: registry-vpc.cn-beijing.aliyuncs.com/dataoke-prod/curl-image:v1
+  script:
+    - curl 'https://oapi.dingtalk.com/robot/send?access_token=ce85debf608100a4ad62f3253b0165fa4af59d6147ec1eb7d8b9bd5cd1b15f1c' -H 'Content-Type:application/json' -d "{\"msgtype\":\"text\",\"text\":{\"content\":\"$CI_PROJECT_NAME项目构建失败\n>本次构建由：$GITLAB_USER_NAME 触发\n>项目名称：$CI_PROJECT_NAME\n>提交号：$CI_COMMIT_SHA\n>提交日志：$CI_COMMIT_MESSAGE\n>构建分支：$CI_COMMIT_BRANCH\n>流水线地址：[$CI_PIPELINE_URL]($CI_PIPELINE_URL)\"}}"
+
+  only:
+    - master
+  when: on_failure
+
+# 构建成功时的通知消息
+notifySuccessWeChat:
+  stage: notify
+  image: registry-vpc.cn-beijing.aliyuncs.com/dataoke-prod/curl-image:v1
+  script:
+    - curl 'https://oapi.dingtalk.com/robot/send?access_token=ce85debf608100a4ad62f3253b0165fa4af59d6147ec1eb7d8b9bd5cd1b15f1c' -H 'Content-Type:application/json' -d "{\"msgtype\":\"text\",\"text\":{\"content\":\"$CI_PROJECT_NAME项目构建成功\n>本次构建由：$GITLAB_USER_NAME 触发\n>项目名称：$CI_PROJECT_NAME\n>提交号：$CI_COMMIT_SHA\n>提交日志：$CI_COMMIT_MESSAGE\n>构建分支：$CI_COMMIT_BRANCH\n>流水线地址：[$CI_PIPELINE_URL]($CI_PIPELINE_URL)\"}}"
+  only:
+    - master
+  when: on_success
+
