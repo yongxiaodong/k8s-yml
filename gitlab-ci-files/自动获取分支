@@ -1,0 +1,42 @@
+pipeline {
+    agent any
+
+    options {
+      buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '15', numToKeepStr: '15')
+    }
+     parameters {
+            string defaultValue: 'https://gitlab.haojiequ.com/dtkgo/dtk_go_app_api.git', description: '项目的git地址', name: 'GIT_PROJECT_URL', trim: false
+            choice choices: ['test1', 'test2', 'test3', 'huise', 'dev1'], description: '选择发布环境，默认发布至test1测试环境', name: 'PENV'
+            gitParameter name: 'GIT_BRANCH',
+                         type: 'PT_BRANCH_TAG',
+                         branchFilter: 'origin/(.*)',
+                         defaultValue: 'master',
+                         selectedValue: 'DEFAULT',
+                         sortMode: 'DESCENDING_SMART',
+                         quickFilterEnabled: true,
+                         description: 'Select your branch or tag.'
+
+        }
+
+    stages {
+        stage('初始化'){
+            steps {
+                script {
+                   env.rootdir = '/home/yxd/'
+                   env.appname = 'dtkAppApi'
+
+                }
+            }
+        }
+        stage('Hello') {
+            steps {
+                checkout([class: 'GitSCM', branches: [[name: "{GIT_BRANCH}"]], extensions: [[class: 'CheckoutOption', timeout: 20], [class: 'CloneOption', depth: 1]], userRemoteConfigs: [[credentialsId: "5ee2cb96-43d2-47e3-9a8a-6d6ee00b9f09", url: "${GIT_PROJECT_URL}"]]])
+            }
+        }
+        stage('Build') {
+            steps {
+                sh 'source ~/.bashrc   && go build'
+            }
+        }
+    }
+}
