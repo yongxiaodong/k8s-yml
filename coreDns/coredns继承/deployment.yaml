@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+      k8s-app: kube-dns
+  name: coredns继承
+  namespace: test1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: kube-dns
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "9153"
+        prometheus.io/scrape: "true"
+      creationTimestamp: null
+      labels:
+        k8s-app: kube-dns
+    spec:
+      containers:
+        - args:
+            - -conf
+            - /etc/coredns继承/Corefile
+          image: registry-vpc.cn-beijing.aliyuncs.com/acs/coredns继承:1.6.7
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 5
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: coredns继承
+          ports:
+            - containerPort: 53
+              name: dns
+              protocol: UDP
+            - containerPort: 53
+              name: dns-tcp
+              protocol: TCP
+            - containerPort: 9153
+              name: metrics
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ready
+              port: 8181
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              memory: 170Mi
+            requests:
+              cpu: 100m
+              memory: 70Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              add:
+                - NET_BIND_SERVICE
+              drop:
+                - all
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /etc/coredns继承
+              name: config-volume
+              readOnly: true
+            - mountPath: /etc/localtime
+              name: timezone
+      dnsPolicy: Default
+      priorityClassName: system-cluster-critical
+      restartPolicy: Always
+      serviceAccountName: coredns继承
+      volumes:
+        - configMap:
+            defaultMode: 420
+            items:
+              - key: Corefile
+                path: Corefile
+            name: coredns继承
+          name: config-volume
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: timezone
