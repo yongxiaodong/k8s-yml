@@ -30,4 +30,4 @@ data:
 kind: ConfigMap
 metadata:
   namespace: test1
-  name: coredns继承
+  name: coredns
