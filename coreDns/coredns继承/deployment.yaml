@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   labels:
       k8s-app: kube-dns
-  name: coredns继承
+  name: coredns
   namespace: test1
 spec:
   replicas: 1
@@ -28,8 +28,8 @@ spec:
       containers:
         - args:
             - -conf
-            - /etc/coredns继承/Corefile
-          image: registry-vpc.cn-beijing.aliyuncs.com/acs/coredns继承:1.6.7
+            - /etc/coredns/Corefile
+          image: registry-vpc.cn-beijing.aliyuncs.com/acs/coredns:1.6.7
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 5
@@ -41,7 +41,7 @@ spec:
             periodSeconds: 10
             successThreshold: 1
             timeoutSeconds: 5
-          name: coredns继承
+          name: coredns
           ports:
             - containerPort: 53
               name: dns
@@ -78,7 +78,7 @@ spec:
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           volumeMounts:
-            - mountPath: /etc/coredns继承
+            - mountPath: /etc/coredns
               name: config-volume
               readOnly: true
             - mountPath: /etc/localtime
@@ -86,14 +86,14 @@ spec:
       dnsPolicy: Default
       priorityClassName: system-cluster-critical
       restartPolicy: Always
-      serviceAccountName: coredns继承
+      serviceAccountName: coredns
       volumes:
         - configMap:
             defaultMode: 420
             items:
               - key: Corefile
                 path: Corefile
-            name: coredns继承
+            name: coredns
           name: config-volume
         - hostPath:
             path: /etc/localtime

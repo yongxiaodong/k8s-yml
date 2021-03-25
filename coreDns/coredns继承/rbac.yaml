@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: coredns继承
+  name: coredns
   namespace: test1
 
 ---
@@ -25,5 +25,5 @@ roleRef:
   name: example-clusterrole
 subjects:
   - kind: ServiceAccount
-    name: coredns继承
+    name: coredns
     namespace: test1
