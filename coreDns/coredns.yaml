@@ -26,5 +26,5 @@ data:
     }
 kind: ConfigMap
 metadata:
-  name: coredns继承
+  name: coredns
   namespace: kube-system
