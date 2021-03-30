@@ -1,0 +1,30 @@
+stages:
+  - docker
+  - deploy
+
+docker:
+  stage: docker
+  image: registry-vpc.cn-beijing.aliyuncs.com/dataoke-prod/kaniko-executor:debug
+  script:
+  - mkdir -p /kaniko/.docker
+  - echo "${DOCKER_AUTH_CONFIG}" > /kaniko/.docker/config.json
+  - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile.prod --destination registry-vpc.cn-beijing.aliyuncs.com/dataoke-prod/${CI_PROJECT_NAME}:${CI_COMMIT_SHORT_SHA} --destination registry-vpc.cn-beijing.aliyuncs.com/dataoke-prod/${CI_PROJECT_NAME}:latest
+  only:
+    - master
+
+deploy:
+  stage: deploy
+  image: registry-vpc.cn-beijing.aliyuncs.com/dataoke-prod/kubectl:1.18.1
+  variables:
+    K8S_NAME_SPACE: default
+  script:
+  - mkdir -p $HOME/.kube
+  - echo "$KUBERNETES_SECRET" >> "$HOME/.kube/config"
+  - kubectl version
+  - kubectl get deployments.apps -n ${K8S_NAME_SPACE}
+  - kubectl -n ${K8S_NAME_SPACE} set image deployment/dtk-static-www nginx=registry-vpc.cn-beijing.aliyuncs.com/dataoke-prod/${CI_PROJECT_NAME}:${CI_COMMIT_SHORT_SHA} --record
+  - kubectl rollout status deploy/dtk-static-www --timeout=5m
+  - kubectl create cm dtk-www-php-reference-static-json --from-file=$CI_PROJECT_DIR/build/www/static.json -o yaml --dry-run=client | kubectl replace -f -
+  - randValue="{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"configmap/checksum\":\"`sha256sum $CI_PROJECT_DIR/build/www/static.json|awk '{print $1}'`\"}}}}}" && kubectl patch deployment dtk-php-www -p $randValue
+  only:
+    - master
