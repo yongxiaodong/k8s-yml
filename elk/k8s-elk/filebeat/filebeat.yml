@@ -20,7 +20,7 @@ data:
                 logs_path: "/var/log/containers/"
       #multiline.pattern: ^\s*(\d{4}|\d{2})\-(\d{2}|[a-zA-Z]{3})\-(\d{2}|\d{4})
       #multiline.pattern: ^(.*)(\d{4}|\d{2})\-(\d{2}|[a-zA-Z]{3})\-(\d{2}|\d{4})\s(\d{2}):(\d{1,2})
-      multiline.pattern: ^(.*)(\d{4}|\d{2})(/|-)(\d{2}|[a-zA-Z]{3})(/|-)(\d{2}|\d{4})\s(\d{2}):(\d{1,2})
+      multiline.pattern: ^(.*)(\d{4}|\d{2})(/|-)(\d{2}|[a-zA-Z]{3})(/|-)(\d{2}|\d{4})\s(\d{2}):(\d{1,2})|^(.*)\S
       multiline.negate: true
       multiline.match: after
       multiline.timeout: 5s
@@ -56,9 +56,13 @@ data:
     output.elasticsearch:
       hosts: ['${ELASTICSEARCH_HOST:elasticsearch}:${ELASTICSEARCH_PORT:9200}']
       indices:
+        - index: "%istio-proxy-%{+yyyy.MM.dd}"
+          when.equals:
+            kubernetes.container.name: istio-proxy
+      #username: ${ELASTICSEARCH_USERNAME}
         - index: "%{[kubernetes.labels.app_kubernetes_io/name]}-%{+yyyy.MM.dd}"
-      username: ${ELASTICSEARCH_USERNAME}
-      password: ${ELASTICSEARCH_PASSWORD}
+      #username: ${ELASTICSEARCH_USERNAME}
+      #password: ${ELASTICSEARCH_PASSWORD}
 ---
 apiVersion: apps/v1
 kind: DaemonSet
@@ -76,6 +80,13 @@ spec:
       labels:
         k8s-app: filebeat
     spec:
+      tolerations:
+        - key: "ip"
+          operator: "Equal"
+          value: "privite"
+          effect: "NoSchedule"
+      imagePullSecrets:
+        - name: aliyun-regcred
       serviceAccountName: filebeat
       terminationGracePeriodSeconds: 30
       hostNetwork: true
@@ -83,14 +94,15 @@ spec:
       containers:
       - name: filebeat
         #image: docker.elastic.co/beats/filebeat:7.6.2
-        image: registry.cn-beijing.aliyuncs.com/yxd-test/filebeat:7.6.2
+        #image: registry.cn-beijing.aliyuncs.com/yxd-test/filebeat:7.6.2
+        image: registry-vpc.cn-beijing.aliyuncs.com/dataoke-prod/filebeat:7.6.2
         args: [
           "-c", "/etc/filebeat.yml",
           "-e",
         ]
         env:
         - name: ELASTICSEARCH_HOST
-          value: elasticsearch
+          value: elasticsearch.logging
         - name: ELASTICSEARCH_PORT
           value: "9200"
         - name: ELASTICSEARCH_USERNAME
