@@ -1,6 +1,6 @@
 FROM registry-vpc.cn-beijing.aliyuncs.com/dataoke-prod/adoptopenjdk-openjdk8:alpine as prod
 
-LABEL MAINTAINER=daxuegao
+
 
 WORKDIR /opt/app
 

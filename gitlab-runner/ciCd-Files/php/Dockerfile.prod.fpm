@@ -1,6 +1,6 @@
 FROM registry-vpc.cn-beijing.aliyuncs.com/dataoke-prod/php:7.2-fpm-alpine-base
 
-LABEL MAINTAINER=hangyao
+
 
 WORKDIR /app
 

@@ -1,3 +1,5 @@
+# 定义coredns配置文件，绑定A记录等
+
 apiVersion: v1
 data:
   Corefile: |
@@ -6,8 +8,9 @@ data:
         health
         ready
         hosts {
-            192.168.12.16 dataoke.com
-            192.168.23.57 openapi.dataoke.com
+            # 定义内部A记录
+            192.168.12.16 itgod.org
+            192.168.23.57 test.com
 
             fallthrough
         }

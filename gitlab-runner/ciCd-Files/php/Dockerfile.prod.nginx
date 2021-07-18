@@ -1,6 +1,6 @@
 FROM registry-vpc.cn-beijing.aliyuncs.com/dataoke-prod/openresty:with-php-fpm-alpine-base
 
-LABEL MAINTAINER=hangyao
+
 
 WORKDIR /app
 

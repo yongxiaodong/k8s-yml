@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   generation: 1
   labels:
-    app.kubernetes.io/managed-by: hang.yao
+    app.kubernetes.io/managed-by: xd
     app.kubernetes.io/name: promtheus
     app.kubernetes.io/version: v2.19.2
   annotations:
